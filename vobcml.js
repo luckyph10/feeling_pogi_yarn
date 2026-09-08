@@ -87,6 +87,7 @@
             'Pending Onshore Review: Unable to update the dispute tracker c/o Lillian Madison.',
             'Pending Onshore Review: Plan type is Self funded, Policy Type is Medicaid.',
             'Dispute is pending VOB: No VOB checkmark AND no case notes confirming plan type.',
+            'Dispute is Pending:  Incomplete eligible evidence.',
             'Dispute is pending VOB: The patient is over 65 years old. Unable to determine primary payer - VOB is not available.',
             'Dispute is pending VOB: Technical Error.',
             'Dispute is pending VOB: 100% of billed charges went to PR indicated in Ineligibility reason in Arbit.',
