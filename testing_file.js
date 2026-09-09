@@ -1,6 +1,6 @@
 (function () {
 
-```
+
 var KEY = "commentPopupAuthorized";
 
 if (localStorage.getItem(KEY) !== "yes") {
@@ -433,6 +433,6 @@ function runScript() {
 
     document.body.appendChild(popup);
 }
-```
+
 
 })();
