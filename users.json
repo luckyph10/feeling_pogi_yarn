@@ -28,7 +28,7 @@ Mode: global
 */
 ``
 
-
+```json
 {
   "settings": {
     "mode": "mixed",
@@ -38,96 +38,154 @@ Mode: global
     {
       "username": "luckyph10",
       "key": "LUCKY001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "glen",
       "key": "GLEN001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "luis",
       "key": "LUIS001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "maylen",
       "key": "MAYLEN001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "alyssandra",
       "key": "ALYSSA001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "khristian",
       "key": "KHRIS001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "donatien",
       "key": "DONA001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "maritess",
       "key": "MARI001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "pams",
       "key": "PAMS001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "anghee",
       "key": "ANGHEE001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "candy",
       "key": "CANDY001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "via",
       "key": "VIA001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "steev",
       "key": "STEEV001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "otep",
       "key": "OTEP001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "chique",
       "key": "CHIQ001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "ahl",
       "key": "AHL001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "mark",
       "key": "MARK001",
-      "enabled": true
-    },{
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
+    },
+    {
       "username": "stefhanie",
       "key": "STE001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     },
     {
       "username": "thea",
       "key": "THEA001",
-      "enabled": true
+      "enabled": true,
+      "activeDeviceId": null,
+      "lastSeen": null
     }
   ]
 }
+```
+
+**Important:** this JSON by itself does **not** prevent simultaneous logins. Your backend needs logic like:
+
+```text
+No activeDeviceId
+    → allow login
+    → save this deviceId
+
+Same activeDeviceId
+    → allow login
+
+Different activeDeviceId
+    → reject login
+```
+
+And `lastSeen` can be used to release a lock when a device has been offline for, for example, 5–10 minutes.
+
+If you send me your **server/backend code that reads `users.json`**, I can modify that code to make these fields actually enforce the one-device rule.
