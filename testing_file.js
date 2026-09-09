@@ -1,30 +1,73 @@
 
-/* =========================================================
-   FPY AUTH — NO PAGE RELOAD
-   Paste this at the TOP of your bookmarklet
-   ========================================================= */
-
 (function () {
 
     const USER_KEY = "fpy_username";
     const ACCESS_KEY = "fpy_key";
 
-    // Already registered → continue normally
-    if (
-        localStorage.getItem(USER_KEY) &&
-        localStorage.getItem(ACCESS_KEY)
-    ) {
+    function startMainCode() {
+
+        // =================================================
+        // YOUR EXISTING CODE GOES HERE
+        // =================================================
+
+
+        // Example:
+        // console.log("Main code is running");
+
+
+        // =================================================
+        // END YOUR EXISTING CODE
+        // =================================================
+    }
+
+
+    // =====================================================
+    // STRICT AUTH CHECK
+    // =====================================================
+
+    const username =
+        localStorage.getItem(USER_KEY);
+
+    const accessKey =
+        localStorage.getItem(ACCESS_KEY);
+
+
+    // REGISTERED
+    if (username && accessKey) {
+
+        startMainCode();
+
         return;
     }
 
-    // Prevent duplicate popup
+
+    // =====================================================
+    // NOT REGISTERED → STOP EVERYTHING
+    // =====================================================
+
     if (document.getElementById("fpy-auth-overlay")) {
         return;
     }
 
-    const overlay = document.createElement("div");
 
-    overlay.id = "fpy-auth-overlay";
+    const overlay =
+        document.createElement("div");
+
+    overlay.id =
+        "fpy-auth-overlay";
+
+
+    overlay.style.cssText = `
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.75);
+        z-index:9999999999;
+        display:flex;
+        justify-content:center;
+        align-items:flex-start;
+        padding-top:60px;
+    `;
+
 
     overlay.innerHTML = `
         <div style="
@@ -61,7 +104,9 @@
                 color:white;
                 text-align:center;
                 margin:0 0 5px;
-            ">Automation Access</h2>
+            ">
+                Automation Access
+            </h2>
 
             <div style="
                 color:#aaa;
@@ -103,96 +148,98 @@
                 "
             >
 
-            <button id="fpy-save-btn" style="
-                width:100%;
-                border:none;
-                border-radius:999px;
-                padding:14px;
-                cursor:pointer;
-                color:white;
-                font-weight:bold;
-                background:linear-gradient(
-                    135deg,
-                    #0078d4,
-                    #00a2ff
-                );
-            ">
+            <button
+                id="fpy-save-btn"
+                style="
+                    width:100%;
+                    border:none;
+                    border-radius:999px;
+                    padding:14px;
+                    cursor:pointer;
+                    color:white;
+                    font-weight:bold;
+                    background:linear-gradient(
+                        135deg,
+                        #0078d4,
+                        #00a2ff
+                    );
+                "
+            >
                 Save & Continue
             </button>
 
         </div>
     `;
 
-    overlay.style.cssText = `
-        position:fixed;
-        inset:0;
-        background:rgba(0,0,0,.75);
-        z-index:9999999999;
-        display:flex;
-        justify-content:center;
-        align-items:flex-start;
-        padding-top:60px;
-    `;
 
     document.body.appendChild(overlay);
 
 
-    // Close
-    document
-        .getElementById("fpy-close-btn")
+    // Close = stay blocked
+    overlay
+        .querySelector("#fpy-close-btn")
         .onclick = function () {
+
             overlay.remove();
+
+            // IMPORTANT:
+            // Main code still does NOT run.
+
         };
 
 
-    // Save
-    document
-        .getElementById("fpy-save-btn")
+    // Save registration
+    overlay
+        .querySelector("#fpy-save-btn")
         .onclick = function () {
 
-            const username =
-                document
-                    .getElementById("fpy-username")
+            const newUsername =
+                overlay
+                    .querySelector("#fpy-username")
                     .value
                     .trim();
 
-            const accessKey =
-                document
-                    .getElementById("fpy-accesskey")
+            const newAccessKey =
+                overlay
+                    .querySelector("#fpy-accesskey")
                     .value
                     .trim();
 
 
-            if (!username || !accessKey) {
-                alert("Username and Access Key are required.");
+            if (!newUsername || !newAccessKey) {
+
+                alert(
+                    "Username and Access Key are required."
+                );
+
                 return;
             }
 
 
             localStorage.setItem(
                 USER_KEY,
-                username
+                newUsername
             );
+
 
             localStorage.setItem(
                 ACCESS_KEY,
-                accessKey
+                newAccessKey
             );
 
 
             overlay.remove();
 
 
-            /*
-             * IMPORTANT:
-             * NO location.reload()
-             *
-             * Your bookmarklet will continue from here only
-             * if the code below was placed in a function.
-             */
+            // NO reload.
+            // Start the previously blocked code now.
+
+            startMainCode();
+
         };
 
 })();
+
 
 (function () {
     var selector =
