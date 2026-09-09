@@ -1,433 +1,638 @@
 
 (function () {
 
+    // =====================================================
+    // MAIN CODE
+    // =====================================================
+
     function runMainCode() {
-        /*
-         * =====================================================
-         * YOUR MAIN CODE STARTS HERE
-         * =====================================================
-         */
+
+        const AUTH_KEY = "caseNoteAuthorized";
+        const USER_KEY = "disputeUser";
+        const STATUS_KEY = "disputeReviewStatus";
+
+        const DRS_OPTIONS = [
+            "Plan Type Validated Post IDR Initiation",
+            "VOB verified, no change to NSA jurisdiction",
+            "VOB pending",
+            "VOB verified dispute is not valid under NSA jurisdiction, requested closure",
+            "Additional Info provided to IDRE through email"
+        ];
 
 
+        // =====================================================
+        // PASSWORD
+        // =====================================================
 
-(function () {
-    const AUTH_KEY = "caseNoteAuthorized";
-    const USER_KEY = "disputeUser";
-    const STATUS_KEY = "disputeReviewStatus";
+        if (localStorage.getItem(AUTH_KEY) !== "yes") {
 
-    const DRS_OPTIONS = [
-        "Plan Type Validated Post IDR Initiation",
-        "VOB verified, no change to NSA jurisdiction",
-        "VOB pending",
-        "VOB verified dispute is not valid under NSA jurisdiction, requested closure",
-        "Additional Info provided to IDRE through email"
-    ];
+            // Prevent duplicate password boxes
+            const existingPassword =
+                document.getElementById("dispute-password-input");
 
-    // ================= PASSWORD =================
-
-    if (localStorage.getItem(AUTH_KEY) !== "yes") {
-        const pwd = document.createElement("input");
-
-        pwd.type = "password";
-        pwd.placeholder = "Enter password";
-
-        pwd.style.cssText = `
-            position:fixed;
-            top:50%;
-            left:50%;
-            transform:translate(-50%,-50%);
-            z-index:999999;
-            padding:12px;
-            font-size:16px;
-            border:2px solid #333;
-            border-radius:8px;
-            outline:none;
-        `;
-
-        document.body.appendChild(pwd);
-        pwd.focus();
-
-        pwd.addEventListener("keydown", function (e) {
-            if (e.key !== "Enter") return;
-
-            if (pwd.value === "202608") {
-                localStorage.setItem(AUTH_KEY, "yes");
-                pwd.remove();
-                initialize();
-            } else {
-                alert("Incorrect password");
-                pwd.remove();
+            if (existingPassword) {
+                return;
             }
-        });
 
-        return;
-    }
+            const pwd = document.createElement("input");
 
-    initialize();
+            pwd.id = "dispute-password-input";
+            pwd.type = "password";
+            pwd.placeholder = "Enter password";
 
-    // ================= INITIALIZE =================
-
-    function initialize() {
-        const savedUser = localStorage.getItem(USER_KEY);
-        const savedStatus = localStorage.getItem(STATUS_KEY);
-
-        if (savedUser && savedStatus) {
-            showMiniPanel();
-            runScript();
-        } else {
-            createPanel();
-        }
-    }
-
-    // ================= MINI PANEL =================
-
-    function showMiniPanel() {
-        const existing = document.getElementById("dispute-mini-panel");
-
-        if (existing) {
-            existing.remove();
-        }
-
-        const mini = document.createElement("div");
-
-        mini.id = "dispute-mini-panel";
-
-        mini.style.cssText = `
-            position:fixed;
-            top:10px;
-            left:10px;
-            z-index:999999;
-            background:rgba(0,0,0,.85);
-            color:white;
-            padding:8px 12px;
-            border-radius:10px;
-            font-family:Arial,sans-serif;
-            display:flex;
-            align-items:center;
-            gap:10px;
-            box-shadow:0 4px 20px rgba(0,0,0,.5);
-            transition:opacity .5s;
-        `;
-
-        mini.innerHTML = `
-            <span style="font-size:12px;">✓ Saved</span>
-
-            <button
-                id="mini-edit-btn"
-                style="
-                    border:none;
-                    padding:5px 10px;
-                    border-radius:6px;
-                    background:#ff9800;
-                    color:white;
-                    cursor:pointer;
-                    font-weight:bold;
-                "
-            >
-                Edit
-            </button>
-        `;
-
-        document.body.appendChild(mini);
-
-        document
-            .getElementById("mini-edit-btn")
-            .addEventListener("click", function () {
-                mini.remove();
-                createPanel();
-            });
-
-        setTimeout(function () {
-            mini.style.opacity = "0";
-
-            setTimeout(function () {
-                if (mini.parentNode) {
-                    mini.remove();
-                }
-            }, 500);
-        }, 2000);
-    }
-
-    // ================= SETTINGS PANEL =================
-
-    function createPanel() {
-        const oldPanel = document.getElementById("dispute-settings-panel");
-
-        if (oldPanel) {
-            oldPanel.remove();
-        }
-
-        const savedUser = localStorage.getItem(USER_KEY) || "";
-        const savedStatus = localStorage.getItem(STATUS_KEY) || "";
-
-        const panel = document.createElement("div");
-
-        panel.id = "dispute-settings-panel";
-
-        panel.style.cssText = `
-            position:fixed;
-            top:10px;
-            left:10px;
-            width:360px;
-            background:rgba(0,0,0,.9);
-            color:white;
-            padding:18px;
-            border-radius:12px;
-            z-index:999999;
-            font-family:Arial,sans-serif;
-            box-shadow:0 6px 25px rgba(0,0,0,.6);
-            backdrop-filter:blur(8px);
-        `;
-
-        const options = DRS_OPTIONS.map(function (item) {
-            return `
-                <option value="${item}">
-                    ${item}
-                </option>
+            pwd.style.cssText = `
+                position:fixed;
+                top:50%;
+                left:50%;
+                transform:translate(-50%,-50%);
+                z-index:999999999;
+                width:260px;
+                padding:12px;
+                font-size:16px;
+                border:2px solid #333;
+                border-radius:8px;
+                outline:none;
+                box-sizing:border-box;
             `;
-        }).join("");
 
-        panel.innerHTML = `
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                margin-bottom:15px;
-            ">
-                <div style="
-                    font-size:18px;
-                    font-weight:bold;
-                ">
-                    Dispute Settings
-                </div>
+            document.body.appendChild(pwd);
+            pwd.focus();
 
-                <div style="
-                    color:${savedUser && savedStatus ? "#00ff66" : "#ff5555"};
-                    font-size:12px;
-                ">
-                    ${savedUser && savedStatus ? "Saved ✓" : "Required"}
-                </div>
-            </div>
+            pwd.addEventListener("keydown", function (e) {
 
-            <div style="margin-bottom:12px;">
-                <div style="
-                    margin-bottom:5px;
-                    font-size:13px;
-                ">
-                    Dispute User
-                </div>
-
-                <input
-                    id="dispute-user"
-                    value="${savedUser}"
-                    style="
-                        width:100%;
-                        padding:10px;
-                        border:none;
-                        border-radius:8px;
-                        box-sizing:border-box;
-                    "
-                >
-            </div>
-
-            <div style="margin-bottom:15px;">
-                <div style="
-                    margin-bottom:5px;
-                    font-size:13px;
-                ">
-                    Dispute Review Status
-                </div>
-
-                <select
-                    id="dispute-status"
-                    style="
-                        width:100%;
-                        padding:10px;
-                        border:none;
-                        border-radius:8px;
-                        box-sizing:border-box;
-                    "
-                >
-                    <option value="">
-                        Select DRS...
-                    </option>
-
-                    ${options}
-                </select>
-            </div>
-
-            <div style="
-                display:flex;
-                gap:10px;
-            ">
-                <button
-                    id="save-dispute-settings"
-                    style="
-                        flex:1;
-                        border:none;
-                        padding:10px;
-                        border-radius:8px;
-                        background:#00c853;
-                        color:white;
-                        font-weight:bold;
-                        cursor:pointer;
-                    "
-                >
-                    Save
-                </button>
-
-                <button
-                    id="close-dispute-settings"
-                    style="
-                        flex:1;
-                        border:none;
-                        padding:10px;
-                        border-radius:8px;
-                        background:#f44336;
-                        color:white;
-                        font-weight:bold;
-                        cursor:pointer;
-                    "
-                >
-                    Close
-                </button>
-            </div>
-        `;
-
-        document.body.appendChild(panel);
-
-        const userInput = document.getElementById("dispute-user");
-        const statusInput = document.getElementById("dispute-status");
-
-        statusInput.value = savedStatus;
-
-        document
-            .getElementById("save-dispute-settings")
-            .addEventListener("click", function () {
-                const user = userInput.value.trim();
-                const status = statusInput.value;
-
-                if (!user || !status) {
-                    alert(
-                        "You must set both Dispute User and Dispute Review Status before continuing."
-                    );
-
+                if (e.key !== "Enter") {
                     return;
                 }
 
-                localStorage.setItem(USER_KEY, user);
-                localStorage.setItem(STATUS_KEY, status);
+                if (pwd.value === "202608") {
 
-                panel.remove();
+                    localStorage.setItem(AUTH_KEY, "yes");
+
+                    pwd.remove();
+
+                    initialize();
+
+                } else {
+
+                    alert("Incorrect password");
+
+                    pwd.remove();
+
+                }
+
+            });
+
+            return;
+        }
+
+
+        initialize();
+
+
+        // =====================================================
+        // INITIALIZE
+        // =====================================================
+
+        function initialize() {
+
+            const savedUser =
+                localStorage.getItem(USER_KEY);
+
+            const savedStatus =
+                localStorage.getItem(STATUS_KEY);
+
+            if (savedUser && savedStatus) {
 
                 showMiniPanel();
 
                 runScript();
-            });
 
-        document
-            .getElementById("close-dispute-settings")
-            .addEventListener("click", function () {
-                if (
-                    localStorage.getItem(USER_KEY) &&
-                    localStorage.getItem(STATUS_KEY)
-                ) {
-                    panel.remove();
-                } else {
-                    alert(
-                        "You must save the settings before closing."
+            } else {
+
+                createPanel();
+
+            }
+
+        }
+
+
+        // =====================================================
+        // MINI PANEL
+        // =====================================================
+
+        function showMiniPanel() {
+
+            const existing =
+                document.getElementById("dispute-mini-panel");
+
+            if (existing) {
+                existing.remove();
+            }
+
+            const mini =
+                document.createElement("div");
+
+            mini.id = "dispute-mini-panel";
+
+            mini.style.cssText = `
+                position:fixed;
+                top:10px;
+                left:10px;
+                z-index:999999999;
+                background:rgba(0,0,0,.85);
+                color:white;
+                padding:8px 12px;
+                border-radius:10px;
+                font-family:Arial,sans-serif;
+                display:flex;
+                align-items:center;
+                gap:10px;
+                box-shadow:0 4px 20px rgba(0,0,0,.5);
+                transition:opacity .5s;
+            `;
+
+            mini.innerHTML = `
+                <span style="font-size:12px;">
+                    ✓ Saved
+                </span>
+
+                <button
+                    id="mini-edit-btn"
+                    style="
+                        border:none;
+                        padding:5px 10px;
+                        border-radius:6px;
+                        background:#ff9800;
+                        color:white;
+                        cursor:pointer;
+                        font-weight:bold;
+                    "
+                >
+                    Edit
+                </button>
+            `;
+
+            document.body.appendChild(mini);
+
+
+            mini
+                .querySelector("#mini-edit-btn")
+                .addEventListener("click", function () {
+
+                    mini.remove();
+
+                    createPanel();
+
+                });
+
+
+            setTimeout(function () {
+
+                mini.style.opacity = "0";
+
+                setTimeout(function () {
+
+                    if (mini.parentNode) {
+                        mini.remove();
+                    }
+
+                }, 500);
+
+            }, 2000);
+
+        }
+
+
+        // =====================================================
+        // SETTINGS PANEL
+        // =====================================================
+
+        function createPanel() {
+
+            const oldPanel =
+                document.getElementById(
+                    "dispute-settings-panel"
+                );
+
+            if (oldPanel) {
+                oldPanel.remove();
+            }
+
+
+            const savedUser =
+                localStorage.getItem(USER_KEY) || "";
+
+            const savedStatus =
+                localStorage.getItem(STATUS_KEY) || "";
+
+
+            const panel =
+                document.createElement("div");
+
+            panel.id =
+                "dispute-settings-panel";
+
+
+            panel.style.cssText = `
+                position:fixed;
+                top:10px;
+                left:10px;
+                width:360px;
+                background:rgba(0,0,0,.9);
+                color:white;
+                padding:18px;
+                border-radius:12px;
+                z-index:999999999;
+                font-family:Arial,sans-serif;
+                box-shadow:0 6px 25px rgba(0,0,0,.6);
+                backdrop-filter:blur(8px);
+                box-sizing:border-box;
+            `;
+
+
+            const options =
+                DRS_OPTIONS
+                    .map(function (item) {
+
+                        return `
+                            <option value="${item}">
+                                ${item}
+                            </option>
+                        `;
+
+                    })
+                    .join("");
+
+
+            panel.innerHTML = `
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:15px;
+                ">
+
+                    <div style="
+                        font-size:18px;
+                        font-weight:bold;
+                    ">
+                        Dispute Settings
+                    </div>
+
+                    <div style="
+                        color:${savedUser && savedStatus
+                            ? "#00ff66"
+                            : "#ff5555"};
+                        font-size:12px;
+                    ">
+                        ${savedUser && savedStatus
+                            ? "Saved ✓"
+                            : "Required"}
+                    </div>
+
+                </div>
+
+
+                <div style="margin-bottom:12px;">
+
+                    <div style="
+                        margin-bottom:5px;
+                        font-size:13px;
+                    ">
+                        Dispute User
+                    </div>
+
+                    <input
+                        id="dispute-user"
+                        value="${escapeHtml(savedUser)}"
+                        style="
+                            width:100%;
+                            padding:10px;
+                            border:none;
+                            border-radius:8px;
+                            box-sizing:border-box;
+                        "
+                    >
+
+                </div>
+
+
+                <div style="margin-bottom:15px;">
+
+                    <div style="
+                        margin-bottom:5px;
+                        font-size:13px;
+                    ">
+                        Dispute Review Status
+                    </div>
+
+                    <select
+                        id="dispute-status"
+                        style="
+                            width:100%;
+                            padding:10px;
+                            border:none;
+                            border-radius:8px;
+                            box-sizing:border-box;
+                        "
+                    >
+
+                        <option value="">
+                            Select DRS...
+                        </option>
+
+                        ${options}
+
+                    </select>
+
+                </div>
+
+
+                <div style="
+                    display:flex;
+                    gap:10px;
+                ">
+
+                    <button
+                        id="save-dispute-settings"
+                        style="
+                            flex:1;
+                            border:none;
+                            padding:10px;
+                            border-radius:8px;
+                            background:#00c853;
+                            color:white;
+                            font-weight:bold;
+                            cursor:pointer;
+                        "
+                    >
+                        Save
+                    </button>
+
+
+                    <button
+                        id="close-dispute-settings"
+                        style="
+                            flex:1;
+                            border:none;
+                            padding:10px;
+                            border-radius:8px;
+                            background:#f44336;
+                            color:white;
+                            font-weight:bold;
+                            cursor:pointer;
+                        "
+                    >
+                        Close
+                    </button>
+
+                </div>
+
+            `;
+
+
+            document.body.appendChild(panel);
+
+
+            const userInput =
+                panel.querySelector("#dispute-user");
+
+            const statusInput =
+                panel.querySelector("#dispute-status");
+
+
+            statusInput.value = savedStatus;
+
+
+            panel
+                .querySelector("#save-dispute-settings")
+                .addEventListener("click", function () {
+
+                    const user =
+                        userInput.value.trim();
+
+                    const status =
+                        statusInput.value;
+
+
+                    if (!user || !status) {
+
+                        alert(
+                            "You must set both Dispute User and Dispute Review Status before continuing."
+                        );
+
+                        return;
+
+                    }
+
+
+                    localStorage.setItem(
+                        USER_KEY,
+                        user
                     );
-                }
-            });
-    }
 
-    // ================= INPUT FILL =================
+                    localStorage.setItem(
+                        STATUS_KEY,
+                        status
+                    );
 
-    function fill(selector, value) {
-        const element = document.querySelector(selector);
 
-        if (!element) {
-            return false;
+                    panel.remove();
+
+
+                    showMiniPanel();
+
+                    runScript();
+
+                });
+
+
+            panel
+                .querySelector("#close-dispute-settings")
+                .addEventListener("click", function () {
+
+                    if (
+                        localStorage.getItem(USER_KEY) &&
+                        localStorage.getItem(STATUS_KEY)
+                    ) {
+
+                        panel.remove();
+
+                    } else {
+
+                        alert(
+                            "You must save the settings before closing."
+                        );
+
+                    }
+
+                });
+
         }
 
-        element.focus();
 
-        element.value = value;
+        // =====================================================
+        // HTML ESCAPE
+        // =====================================================
 
-        element.dispatchEvent(
-            new Event("input", {
-                bubbles: true
-            })
-        );
+        function escapeHtml(value) {
 
-        element.dispatchEvent(
-            new KeyboardEvent("keydown", {
-                key: "Enter",
-                code: "Enter",
-                keyCode: 13,
-                which: 13,
-                bubbles: true
-            })
-        );
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
 
-        return true;
-    }
-
-    // ================= MAIN SCRIPT =================
-
-    function runScript() {
-        const disputeUser = localStorage.getItem(USER_KEY);
-        const disputeStatus = localStorage.getItem(STATUS_KEY);
-
-        if (!disputeUser || !disputeStatus) {
-            return;
         }
 
-        const ownerSelector =
-            "#ngForm > fieldset > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > ng-select > div > div > div.ng-input > input[type=text]";
 
-        const noteSelector =
-            "#ngForm > fieldset > div:nth-child(1) > div:nth-child(1) > div:nth-child(4) > ng-select > div > div > div.ng-input > input[type=text]";
+        // =====================================================
+        // INPUT FILL
+        // =====================================================
 
-        fill(ownerSelector, disputeUser);
+        function fill(selector, value) {
 
-        setTimeout(function () {
-            fill(noteSelector, disputeStatus);
-        }, 0);
+            const element =
+                document.querySelector(selector);
+
+            if (!element) {
+                return false;
+            }
+
+
+            element.focus();
+
+            element.value = value;
+
+
+            element.dispatchEvent(
+                new Event("input", {
+                    bubbles: true
+                })
+            );
+
+
+            element.dispatchEvent(
+                new Event("change", {
+                    bubbles: true
+                })
+            );
+
+
+            element.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: "Enter",
+                    code: "Enter",
+                    keyCode: 13,
+                    which: 13,
+                    bubbles: true
+                })
+            );
+
+
+            element.dispatchEvent(
+                new KeyboardEvent("keyup", {
+                    key: "Enter",
+                    code: "Enter",
+                    keyCode: 13,
+                    which: 13,
+                    bubbles: true
+                })
+            );
+
+
+            return true;
+
+        }
+
+
+        // =====================================================
+        // MAIN SCRIPT
+        // =====================================================
+
+        function runScript() {
+
+            const disputeUser =
+                localStorage.getItem(USER_KEY);
+
+            const disputeStatus =
+                localStorage.getItem(STATUS_KEY);
+
+
+            if (!disputeUser || !disputeStatus) {
+                return;
+            }
+
+
+            const ownerSelector =
+                "#ngForm > fieldset > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > ng-select > div > div > div.ng-input > input[type=text]";
+
+
+            const noteSelector =
+                "#ngForm > fieldset > div:nth-child(1) > div:nth-child(1) > div:nth-child(4) > ng-select > div > div > div.ng-input > input[type=text]";
+
+
+            fill(
+                ownerSelector,
+                disputeUser
+            );
+
+
+            setTimeout(function () {
+
+                fill(
+                    noteSelector,
+                    disputeStatus
+                );
+
+            }, 0);
+
+        }
+
     }
-})();
 
 
-        /*
-         * =====================================================
-         * YOUR MAIN CODE ENDS HERE
-         * =====================================================
-         */
-    }
-
+    // =====================================================
+    // OUTER REGISTRATION
+    // =====================================================
 
     function showAuthOverlay() {
 
-        // Prevent duplicate overlays
-        const existing = document.getElementById("fpy-auth-overlay");
+        const existing =
+            document.getElementById(
+                "fpy-auth-overlay"
+            );
+
 
         if (existing) {
             existing.remove();
         }
 
-        const overlay = document.createElement("div");
 
-        overlay.id = "fpy-auth-overlay";
+        const overlay =
+            document.createElement("div");
+
+        overlay.id =
+            "fpy-auth-overlay";
+
 
         overlay.innerHTML = `
 
             <div class="fpy-auth-card">
 
-                <button id="fpy-close-btn">✕</button>
+                <button id="fpy-close-btn">
+                    ✕
+                </button>
 
-                <div class="fpy-logo">🔐</div>
+                <div class="fpy-logo">
+                    🔐
+                </div>
 
-                <h2>Automation Access</h2>
+                <h2>
+                    Automation Access
+                </h2>
 
                 <div class="fpy-subtitle">
                     One-time registration only
@@ -435,12 +640,16 @@
 
                 <input
                     id="fpy-username"
-                    placeholder="Username">
+                    placeholder="Username"
+                    autocomplete="off"
+                >
 
                 <input
                     id="fpy-accesskey"
                     type="password"
-                    placeholder="Access Key">
+                    placeholder="Access Key"
+                    autocomplete="off"
+                >
 
                 <button id="fpy-save-btn">
                     Save & Continue
@@ -450,92 +659,106 @@
 
         `;
 
-        const style = document.createElement("style");
 
-        style.id = "fpy-auth-style";
+        const style =
+            document.createElement("style");
+
+
+        style.id =
+            "fpy-auth-style";
+
 
         style.textContent = `
 
             #fpy-auth-overlay {
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,.75);
-                z-index: 999999999;
-                display: flex;
-                justify-content: center;
-                align-items: flex-start;
-                padding-top: 60px;
+                position:fixed;
+                inset:0;
+                background:rgba(0,0,0,.75);
+                z-index:9999999999;
+                display:flex;
+                justify-content:center;
+                align-items:flex-start;
+                padding-top:60px;
             }
+
 
             .fpy-auth-card {
-                width: 420px;
-                background: #1f1f1f;
-                border-radius: 22px;
-                padding: 25px;
-                position: relative;
-                box-shadow: 0 20px 60px rgba(0,0,0,.5);
-                box-sizing: border-box;
+                width:420px;
+                max-width:calc(100vw - 30px);
+                background:#1f1f1f;
+                border-radius:22px;
+                padding:25px;
+                position:relative;
+                box-shadow:0 20px 60px rgba(0,0,0,.5);
+                box-sizing:border-box;
             }
+
 
             #fpy-close-btn {
-                position: absolute;
-                right: 12px;
-                top: 12px;
-                width: 32px;
-                height: 32px;
-                border: none;
-                border-radius: 50%;
-                cursor: pointer;
-                color: white;
-                background: rgba(255,255,255,.08);
+                position:absolute;
+                right:12px;
+                top:12px;
+                width:32px;
+                height:32px;
+                border:none;
+                border-radius:50%;
+                cursor:pointer;
+                color:white;
+                background:rgba(255,255,255,.08);
             }
+
 
             .fpy-logo {
-                font-size: 40px;
-                text-align: center;
-                margin-bottom: 10px;
+                font-size:40px;
+                text-align:center;
+                margin-bottom:10px;
             }
+
 
             .fpy-auth-card h2 {
-                color: white;
-                text-align: center;
-                margin-bottom: 5px;
+                color:white;
+                text-align:center;
+                margin:0 0 5px;
             }
 
+
             .fpy-subtitle {
-                color: #aaa;
-                text-align: center;
-                margin-bottom: 20px;
-                font-size: 13px;
+                color:#aaa;
+                text-align:center;
+                margin-bottom:20px;
+                font-size:13px;
             }
+
 
             #fpy-username,
             #fpy-accesskey {
-                width: 100%;
-                padding: 14px 16px;
-                margin-bottom: 15px;
-                border-radius: 999px;
-                border: 1px solid rgba(255,255,255,.15);
-                background: rgba(255,255,255,.08);
-                color: white;
-                box-sizing: border-box;
-                outline: none;
+                width:100%;
+                padding:14px 16px;
+                margin-bottom:15px;
+                border-radius:999px;
+                border:1px solid rgba(255,255,255,.15);
+                background:rgba(255,255,255,.08);
+                color:white;
+                box-sizing:border-box;
+                outline:none;
             }
+
 
             #fpy-username::placeholder,
             #fpy-accesskey::placeholder {
-                color: #aaa;
+                color:#aaa;
             }
 
+
             #fpy-save-btn {
-                width: 100%;
-                border: none;
-                border-radius: 999px;
-                padding: 14px;
-                cursor: pointer;
-                color: white;
-                font-weight: bold;
-                background: linear-gradient(
+                width:100%;
+                border:none;
+                border-radius:999px;
+                padding:14px;
+                cursor:pointer;
+                color:white;
+                font-weight:bold;
+                background:linear-gradient(
                     135deg,
                     #0078d4,
                     #00a2ff
@@ -544,12 +767,29 @@
 
         `;
 
+
+        // Prevent duplicate style
+        const oldStyle =
+            document.getElementById(
+                "fpy-auth-style"
+            );
+
+        if (oldStyle) {
+            oldStyle.remove();
+        }
+
+
         document.head.appendChild(style);
+
         document.body.appendChild(overlay);
 
 
-        document
-            .getElementById("fpy-close-btn")
+        // =================================================
+        // CLOSE
+        // =================================================
+
+        overlay
+            .querySelector("#fpy-close-btn")
             .onclick = function () {
 
                 overlay.remove();
@@ -557,19 +797,28 @@
             };
 
 
-        document
-            .getElementById("fpy-save-btn")
+        // =================================================
+        // SAVE
+        // =================================================
+
+        overlay
+            .querySelector("#fpy-save-btn")
             .onclick = function () {
 
                 const username =
-                    document
-                        .getElementById("fpy-username")
+                    overlay
+                        .querySelector(
+                            "#fpy-username"
+                        )
                         .value
                         .trim();
 
+
                 const accessKey =
-                    document
-                        .getElementById("fpy-accesskey")
+                    overlay
+                        .querySelector(
+                            "#fpy-accesskey"
+                        )
                         .value
                         .trim();
 
@@ -585,11 +834,11 @@
                 }
 
 
-                // Save credentials
                 localStorage.setItem(
                     "fpy_username",
                     username
                 );
+
 
                 localStorage.setItem(
                     "fpy_key",
@@ -597,12 +846,13 @@
                 );
 
 
+                // Remove registration UI
                 overlay.remove();
 
 
-                // IMPORTANT:
-                // Do NOT reload the page.
-                // Continue directly into your main code.
+                // =================================================
+                // NO PAGE RELOAD
+                // =================================================
 
                 runMainCode();
 
@@ -612,14 +862,18 @@
 
 
     // =====================================================
-    // AUTH CHECK
+    // CHECK REGISTRATION
     // =====================================================
 
     const username =
-        localStorage.getItem("fpy_username");
+        localStorage.getItem(
+            "fpy_username"
+        );
 
     const accessKey =
-        localStorage.getItem("fpy_key");
+        localStorage.getItem(
+            "fpy_key"
+        );
 
 
     if (!username || !accessKey) {
@@ -632,11 +886,9 @@
 
 
     // =====================================================
-    // AUTH PASSED
+    // ALREADY REGISTERED
     // =====================================================
 
     runMainCode();
 
 })();
-
-
