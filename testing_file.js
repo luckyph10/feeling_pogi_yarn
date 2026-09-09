@@ -1,346 +1,747 @@
 
-(function () {
-    const USER_KEY = "disputeUser";
-    const STATUS_KEY = "disputeReviewStatus";
+(async () => {
 
-    const DRS_OPTIONS = [
-        "Plan Type Validated Post IDR Initiation",
-        "VOB verified, no change to NSA jurisdiction",
-        "VOB pending",
-        "VOB verified dispute is not valid under NSA jurisdiction, requested closure",
-        "Additional Info provided to IDRE through email"
+    const E = [
+        /no\s*ssl/i,
+        /federal\s*idr\s*process/i,
+        /rarc\s*code\s*n859/i,
+        /self[-\s]*funded/i,
+        /erisa/i,
+        /oos/i,
+        /out\s*of\s*state/i,
+        /anthem\s*bcbs\s*ohio/i,
+        /balanced\s*funding/i,
+        /exchange\s*\/?\s*marketplace/i,
+        /fully\s*insured/i,
+        /fully\s*insured\s*-\s*over\s*65/i,
+        /fully\s*insured\s*\(opt\s*in\)/i,
+        /fully\s*insured\s*bluecard/i
     ];
 
-    initialize();
 
-    // ================= INITIALIZE =================
+    /* =========================================================
+       CLIPBOARD
+       ========================================================= */
 
-    function initialize() {
-        const savedUser = localStorage.getItem(USER_KEY);
-        const savedStatus = localStorage.getItem(STATUS_KEY);
+    const copyToClipboard = async text => {
 
-        if (savedUser && savedStatus) {
-            showMiniPanel();
-            runScript();
-        } else {
-            createPanel();
-        }
-    }
-
-    // ================= MINI PANEL =================
-
-    function showMiniPanel() {
-        const existing = document.getElementById("dispute-mini-panel");
-
-        if (existing) {
-            existing.remove();
-        }
-
-        const mini = document.createElement("div");
-
-        mini.id = "dispute-mini-panel";
-
-        mini.style.cssText = `
-            position:fixed;
-            top:10px;
-            left:10px;
-            z-index:999999;
-            background:rgba(0,0,0,.85);
-            color:white;
-            padding:8px 12px;
-            border-radius:10px;
-            font-family:Arial,sans-serif;
-            display:flex;
-            align-items:center;
-            gap:10px;
-            box-shadow:0 4px 20px rgba(0,0,0,.5);
-            transition:opacity .5s;
-        `;
-
-        mini.innerHTML = `
-            <span style="font-size:12px;">✓ Saved</span>
-
-            <button
-                id="mini-edit-btn"
-                style="
-                    border:none;
-                    padding:5px 10px;
-                    border-radius:6px;
-                    background:#ff9800;
-                    color:white;
-                    cursor:pointer;
-                    font-weight:bold;
-                "
-            >
-                Edit
-            </button>
-        `;
-
-        document.body.appendChild(mini);
-
-        document
-            .getElementById("mini-edit-btn")
-            .addEventListener("click", function () {
-                mini.remove();
-                createPanel();
-            });
-
-        setTimeout(function () {
-            mini.style.opacity = "0";
-
-            setTimeout(function () {
-                if (mini.parentNode) {
-                    mini.remove();
-                }
-            }, 500);
-        }, 2000);
-    }
-
-    // ================= SETTINGS PANEL =================
-
-    function createPanel() {
-        const oldPanel = document.getElementById("dispute-settings-panel");
-
-        if (oldPanel) {
-            oldPanel.remove();
-        }
-
-        const savedUser = localStorage.getItem(USER_KEY) || "";
-        const savedStatus = localStorage.getItem(STATUS_KEY) || "";
-
-        const panel = document.createElement("div");
-
-        panel.id = "dispute-settings-panel";
-
-        panel.style.cssText = `
-            position:fixed;
-            top:10px;
-            left:10px;
-            width:360px;
-            background:rgba(0,0,0,.9);
-            color:white;
-            padding:18px;
-            border-radius:12px;
-            z-index:999999;
-            font-family:Arial,sans-serif;
-            box-shadow:0 6px 25px rgba(0,0,0,.6);
-            backdrop-filter:blur(8px);
-        `;
-
-        const options = DRS_OPTIONS.map(function (item) {
-            return `
-                <option value="${item}">
-                    ${item}
-                </option>
-            `;
-        }).join("");
-
-        panel.innerHTML = `
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                margin-bottom:15px;
-            ">
-                <div style="
-                    font-size:18px;
-                    font-weight:bold;
-                ">
-                    Dispute Settings
-                </div>
-
-                <div style="
-                    color:${savedUser && savedStatus ? "#00ff66" : "#ff5555"};
-                    font-size:12px;
-                ">
-                    ${savedUser && savedStatus ? "Saved ✓" : "Required"}
-                </div>
-            </div>
-
-            <div style="margin-bottom:12px;">
-                <div style="
-                    margin-bottom:5px;
-                    font-size:13px;
-                ">
-                    Dispute User
-                </div>
-
-                <input
-                    id="dispute-user"
-                    value="${savedUser}"
-                    style="
-                        width:100%;
-                        padding:10px;
-                        border:none;
-                        border-radius:8px;
-                        box-sizing:border-box;
-                    "
-                >
-            </div>
-
-            <div style="margin-bottom:15px;">
-                <div style="
-                    margin-bottom:5px;
-                    font-size:13px;
-                ">
-                    Dispute Review Status
-                </div>
-
-                <select
-                    id="dispute-status"
-                    style="
-                        width:100%;
-                        padding:10px;
-                        border:none;
-                        border-radius:8px;
-                        box-sizing:border-box;
-                    "
-                >
-                    <option value="">
-                        Select DRS...
-                    </option>
-
-                    ${options}
-                </select>
-            </div>
-
-            <div style="
-                display:flex;
-                gap:10px;
-            ">
-                <button
-                    id="save-dispute-settings"
-                    style="
-                        flex:1;
-                        border:none;
-                        padding:10px;
-                        border-radius:8px;
-                        background:#00c853;
-                        color:white;
-                        font-weight:bold;
-                        cursor:pointer;
-                    "
-                >
-                    Save
-                </button>
-
-                <button
-                    id="close-dispute-settings"
-                    style="
-                        flex:1;
-                        border:none;
-                        padding:10px;
-                        border-radius:8px;
-                        background:#f44336;
-                        color:white;
-                        font-weight:bold;
-                        cursor:pointer;
-                    "
-                >
-                    Close
-                </button>
-            </div>
-        `;
-
-        document.body.appendChild(panel);
-
-        const userInput = document.getElementById("dispute-user");
-        const statusInput = document.getElementById("dispute-status");
-
-        statusInput.value = savedStatus;
-
-        document
-            .getElementById("save-dispute-settings")
-            .addEventListener("click", function () {
-                const user = userInput.value.trim();
-                const status = statusInput.value;
-
-                if (!user || !status) {
-                    alert(
-                        "You must set both Dispute User and Dispute Review Status before continuing."
-                    );
-
-                    return;
-                }
-
-                localStorage.setItem(USER_KEY, user);
-                localStorage.setItem(STATUS_KEY, status);
-
-                panel.remove();
-
-                showMiniPanel();
-
-                runScript();
-            });
-
-        document
-            .getElementById("close-dispute-settings")
-            .addEventListener("click", function () {
-                if (
-                    localStorage.getItem(USER_KEY) &&
-                    localStorage.getItem(STATUS_KEY)
-                ) {
-                    panel.remove();
-                } else {
-                    alert(
-                        "You must save the settings before closing."
-                    );
-                }
-            });
-    }
-
-    // ================= INPUT FILL =================
-
-    function fill(selector, value) {
-        const element = document.querySelector(selector);
-
-        if (!element) {
+        if (!text) {
             return false;
         }
 
-        element.focus();
 
-        element.value = value;
+        /* -----------------------------------------
+           MODERN CLIPBOARD API
+           ----------------------------------------- */
 
-        element.dispatchEvent(
-            new Event("input", {
-                bubbles: true
-            })
-        );
+        try {
 
-        element.dispatchEvent(
-            new KeyboardEvent("keydown", {
-                key: "Enter",
-                code: "Enter",
-                keyCode: 13,
-                which: 13,
-                bubbles: true
-            })
-        );
+            if (
+                navigator.clipboard &&
+                typeof navigator.clipboard.writeText === "function"
+            ) {
 
-        return true;
-    }
+                await navigator.clipboard.writeText(text);
 
-    // ================= MAIN SCRIPT =================
+                return true;
 
-    function runScript() {
-        const disputeUser = localStorage.getItem(USER_KEY);
-        const disputeStatus = localStorage.getItem(STATUS_KEY);
+            }
 
-        if (!disputeUser || !disputeStatus) {
-            return;
+        } catch (e) {
+
+            console.warn(
+                "Clipboard API failed:",
+                e
+            );
+
         }
 
-        const ownerSelector =
-            "#ngForm > fieldset > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > ng-select > div > div > div.ng-input > input[type=text]";
 
-        const noteSelector =
-            "#ngForm > fieldset > div:nth-child(1) > div:nth-child(1) > div:nth-child(4) > ng-select > div > div > div.ng-input > input[type=text]";
+        /* -----------------------------------------
+           FALLBACK
+           ----------------------------------------- */
 
-        fill(ownerSelector, disputeUser);
+        try {
 
-        setTimeout(function () {
-            fill(noteSelector, disputeStatus);
-        }, 0);
+            const textarea =
+                document.createElement("textarea");
+
+
+            textarea.value = text;
+
+            textarea.setAttribute(
+                "readonly",
+                ""
+            );
+
+
+            Object.assign(
+                textarea.style,
+                {
+                    position: "fixed",
+                    left: "-10000px",
+                    top: "0",
+                    width: "1px",
+                    height: "1px",
+                    opacity: "0",
+                    pointerEvents: "none",
+                    zIndex: "2147483647"
+                }
+            );
+
+
+            document.body.appendChild(
+                textarea
+            );
+
+
+            textarea.focus();
+
+            textarea.select();
+
+            textarea.setSelectionRange(
+                0,
+                text.length
+            );
+
+
+            const result =
+                document.execCommand("copy");
+
+
+            textarea.remove();
+
+
+            return result;
+
+        } catch (e) {
+
+            console.error(
+                "Clipboard fallback failed:",
+                e
+            );
+
+            return false;
+
+        }
+
+    };
+
+
+    /* =========================================================
+       NOTIFICATION
+       ========================================================= */
+
+    const showNotification = (
+        message,
+        success = true
+    ) => {
+
+        const old =
+            document.getElementById(
+                "case-history-evidence-notification"
+            );
+
+
+        if (old) {
+            old.remove();
+        }
+
+
+        const p =
+            document.createElement("div");
+
+
+        p.id =
+            "case-history-evidence-notification";
+
+
+        p.textContent =
+            message;
+
+
+        Object.assign(
+            p.style,
+            {
+                position: "fixed",
+                top: "20px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                zIndex: "2147483647",
+                background:
+                    success
+                        ? "#198754"
+                        : "#dc3545",
+                color: "#fff",
+                padding: "12px 22px",
+                borderRadius: "7px",
+                fontSize: "14px",
+                fontWeight: "600",
+                fontFamily:
+                    "Arial,sans-serif",
+                boxShadow:
+                    "0 4px 15px rgba(0,0,0,.35)",
+                opacity: "0",
+                transition:
+                    "opacity .2s",
+                maxWidth:
+                    "calc(100vw - 40px)",
+                textAlign: "center",
+                whiteSpace: "normal",
+                wordBreak: "break-word"
+            }
+        );
+
+
+        document.body.appendChild(p);
+
+
+        requestAnimationFrame(() => {
+            p.style.opacity = "1";
+        });
+
+
+        setTimeout(() => {
+
+            p.style.opacity = "0";
+
+
+            setTimeout(() => {
+
+                if (p.parentNode) {
+                    p.remove();
+                }
+
+            }, 250);
+
+        }, 2500);
+
+    };
+
+
+    /* =========================================================
+       OPEN NEW DROPDOWN FIRST
+       ========================================================= */
+
+    try {
+
+        const dropBtn =
+            document.querySelector(
+                "#ngForm > fieldset > div:nth-child(24) > div.d-flex.mb-2 > button"
+            );
+
+
+        if (dropBtn) {
+
+            const collapse =
+                document.querySelector(
+                    "#ngForm > fieldset > div:nth-child(24) > div.collapse"
+                );
+
+
+            if (
+                collapse &&
+                !collapse.classList.contains("show")
+            ) {
+
+                dropBtn.click();
+
+                await new Promise(
+                    resolve =>
+                        setTimeout(
+                            resolve,
+                            500
+                        )
+                );
+
+            }
+
+        }
+
+    } catch (e) {
+
+        console.warn(
+            "Could not open Case Notes section:",
+            e
+        );
+
     }
+
+
+    /* =========================================================
+       VOB HISTORY
+       ========================================================= */
+
+    let vDate = "";
+    let vNote = "";
+    let vTime = 0;
+
+
+    try {
+
+        const btn =
+            document.querySelector(
+                "#ngForm > fieldset > div:nth-child(5) > div:nth-child(1) > div:nth-child(2) > app-vob-history > div > div:nth-child(3) > div.small.text-muted.d-inline-flex.align-items-center.gap-1.user-select-none"
+            );
+
+
+        if (btn) {
+
+            const panel =
+                document.querySelector(
+                    "#ngForm > fieldset > div:nth-child(5) > div:nth-child(1) > div:nth-child(2) > app-vob-history > div > div:nth-child(3) > div.collapse.mt-1.small"
+                );
+
+
+            if (
+                panel &&
+                !panel.classList.contains("show")
+            ) {
+
+                btn.click();
+
+                await new Promise(
+                    resolve =>
+                        setTimeout(
+                            resolve,
+                            500
+                        )
+                );
+
+            }
+
+
+            const vd =
+                document.querySelector(
+                    "#ngForm > fieldset > div:nth-child(5) > div:nth-child(1) > div:nth-child(2) > app-vob-history > div > div:nth-child(3) > div.collapse.mt-1.small.show > div > div > div.d-flex.align-items-center.flex-wrap.gap-1.mb-1 > span.text-muted.ms-auto.text-nowrap"
+                )?.innerText
+                    ?.trim()
+                || "";
+
+
+            vNote =
+                document.querySelector(
+                    "#ngForm > fieldset > div:nth-child(5) > div:nth-child(1) > div:nth-child(2) > app-vob-history > div > div:nth-child(3) > div.collapse.mt-1.small.show > div > div > div.text-muted.fst-italic"
+                )?.innerText
+                    ?.trim()
+                    .replace(
+                        /^"+|"+$/g,
+                        ""
+                    )
+                || "";
+
+
+            const m =
+                vd.match(
+                    /(\d{4})-(\d{2})-(\d{2})/
+                );
+
+
+            if (m) {
+
+                vDate =
+                    `${parseInt(m[2],10)}/${parseInt(m[3],10)}/${m[1]}`;
+
+
+                vTime =
+                    new Date(
+                        Number(m[1]),
+                        Number(m[2]) - 1,
+                        Number(m[3])
+                    ).getTime();
+
+            }
+
+        }
+
+    } catch (e) {
+
+        console.warn(
+            "VOB History extraction error:",
+            e
+        );
+
+    }
+
+
+    /* =========================================================
+       NEW SELECTOR
+       ========================================================= */
+
+    let sDate = "";
+    let sNote = "";
+    let sTime = 0;
+
+
+    try {
+
+        const newSelector =
+            "#ngForm > fieldset > div:nth-child(24) > div.collapse.show > div > div:nth-child(3)";
+
+
+        const newEl =
+            document.querySelector(
+                newSelector
+            );
+
+
+        if (newEl) {
+
+            const txt =
+                (
+                    newEl.innerText ||
+                    ""
+                )
+                .replace(/\s+/g, " ")
+                .trim();
+
+
+            let dm =
+                txt.match(
+                    /([A-Z][a-z]{2,8}\s+\d{1,2},\s+\d{4}\s+\d{1,2}:\d{2}\s*[AP]M)/i
+                );
+
+
+            if (dm) {
+
+                const d =
+                    new Date(
+                        dm[1]
+                    );
+
+
+                if (!isNaN(d.getTime())) {
+
+                    sTime =
+                        d.getTime();
+
+                    sDate =
+                        d.toLocaleDateString(
+                            "en-US"
+                        );
+
+                }
+
+            }
+
+
+            if (!sTime) {
+
+                dm =
+                    txt.match(
+                        /(\d{1,2}\/\d{1,2}\/\d{4}\s+\d{1,2}:\d{2}\s*[AP]M)/i
+                    );
+
+
+                if (dm) {
+
+                    const d =
+                        new Date(
+                            dm[1]
+                        );
+
+
+                    if (!isNaN(d.getTime())) {
+
+                        sTime =
+                            d.getTime();
+
+                        sDate =
+                            d.toLocaleDateString(
+                                "en-US"
+                            );
+
+                    }
+
+                }
+
+            }
+
+
+            if (!sTime) {
+
+                dm =
+                    txt.match(
+                        /(\d{4}-\d{2}-\d{2}\s+\d{1,2}:\d{2}\s*[AP]M)/i
+                    );
+
+
+                if (dm) {
+
+                    const d =
+                        new Date(
+                            dm[1]
+                        );
+
+
+                    if (!isNaN(d.getTime())) {
+
+                        sTime =
+                            d.getTime();
+
+                        sDate =
+                            d.toLocaleDateString(
+                                "en-US"
+                            );
+
+                    }
+
+                }
+
+            }
+
+
+            sNote =
+                txt
+                    .replace(
+                        /([A-Z][a-z]{2,8}\s+\d{1,2},\s+\d{4}\s+\d{1,2}:\d{2}\s*[AP]M)/i,
+                        ""
+                    )
+                    .replace(
+                        /(\d{1,2}\/\d{1,2}\/\d{4}\s+\d{1,2}:\d{2}\s*[AP]M)/i,
+                        ""
+                    )
+                    .replace(
+                        /(\d{4}-\d{2}-\d{2}\s+\d{1,2}:\d{2}\s*[AP]M)/i,
+                        ""
+                    )
+                    .trim();
+
+
+            if (
+                !E.some(
+                    x => x.test(txt)
+                )
+            ) {
+
+                sNote = "";
+
+            }
+
+        }
+
+    } catch (e) {
+
+        console.warn(
+            "New selector extraction error:",
+            e
+        );
+
+    }
+
+
+    /* =========================================================
+       CASE NOTE
+       ========================================================= */
+
+    let cDate = "";
+    let cNote = "";
+    let cTime = 0;
+
+
+    try {
+
+        for (
+            const r of
+            [
+                ...document.querySelectorAll("tr")
+            ].reverse()
+        ) {
+
+            const t =
+                (
+                    r.innerText ||
+                    ""
+                )
+                .replace(
+                    /\s+/g,
+                    " "
+                )
+                .trim();
+
+
+            if (
+                E.some(
+                    x => x.test(t)
+                )
+            ) {
+
+                const dm =
+                    t.match(
+                        /([A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}.*?[AP]M)/i
+                    );
+
+
+                if (dm) {
+
+                    cTime =
+                        new Date(
+                            dm[1]
+                        ).getTime();
+
+
+                    cDate =
+                        new Date(
+                            dm[1]
+                        ).toLocaleDateString(
+                            "en-US"
+                        );
+
+
+                    cNote =
+                        t
+                            .replace(
+                                /^.*?[AP]M\s+/,
+                                ""
+                            )
+                            .trim();
+
+                }
+
+
+                break;
+
+            }
+
+        }
+
+    } catch (e) {
+
+        console.warn(
+            "Case note extraction error:",
+            e
+        );
+
+    }
+
+
+    /* =========================================================
+       PICK BEST / NEWEST
+       ========================================================= */
+
+    const candidates = [];
+
+
+    if (
+        cTime > 0 &&
+        cNote
+    ) {
+
+        candidates.push({
+            time: cTime,
+            date: cDate,
+            note: cNote,
+            source: "Case Note"
+        });
+
+    }
+
+
+    if (
+        sTime > 0 &&
+        sNote
+    ) {
+
+        candidates.push({
+            time: sTime,
+            date: sDate,
+            note: sNote,
+            source: "New Selector"
+        });
+
+    }
+
+
+    if (
+        vTime > 0 &&
+        vNote
+    ) {
+
+        candidates.push({
+            time: vTime,
+            date: vDate,
+            note: vNote,
+            source: "VOB History"
+        });
+
+    }
+
+
+    candidates.sort(
+        (a,b) =>
+            b.time - a.time
+    );
+
+
+    let out = "";
+    let source = "";
+
+
+    if (candidates.length) {
+
+        const best =
+            candidates[0];
+
+
+        out =
+            `${best.date} - ${best.note}`;
+
+
+        source =
+            best.source;
+
+    }
+
+
+    /* =========================================================
+       COPY RESULT
+       ========================================================= */
+
+    if (out) {
+
+        const copied =
+            await copyToClipboard(
+                out
+            );
+
+
+        if (copied) {
+
+            showNotification(
+                `Copied: ${source}`,
+                true
+            );
+
+            console.log(
+                "CASE/HISTORY EVIDENCE COPIED:",
+                out
+            );
+
+        } else {
+
+            showNotification(
+                "Evidence found, but clipboard copy failed.",
+                false
+            );
+
+            console.warn(
+                "Clipboard failed. Evidence:",
+                out
+            );
+
+        }
+
+    } else {
+
+        showNotification(
+            "No supporting note found",
+            false
+        );
+
+        console.warn(
+            "No supporting note found."
+        );
+
+    }
+
 })();
