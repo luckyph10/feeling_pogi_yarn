@@ -5,8 +5,7 @@
     const ACCESS_KEY = "fpy_key";
 
     // CHANGE THIS TO YOUR access.html URL
-    const ACCESS_PAGE ="https://luckyph10.github.io/feeling_pogi_yarn/access.html";
-
+    const ACCESS_PAGE = "https://luckyph10.github.io/feeling_pogi_yarn/access.html";
 
     // =====================================================
     // ALREADY REGISTERED
