@@ -4,113 +4,239 @@
     const USER_KEY = "fpy_username";
     const ACCESS_KEY = "fpy_key";
 
-    // CHANGE THIS TO YOUR access.html URL
-    const ACCESS_PAGE = "https://luckyph10.github.io/feeling_pogi_yarn/access.html";
+    function startMainCode() {
+
+        // =================================================
+        // YOUR EXISTING CODE GOES HERE
+        // =================================================
+
+
+        // Example:
+        // console.log("Main code is running");
+
+
+        // =================================================
+        // END YOUR EXISTING CODE
+        // =================================================
+    }
+
 
     // =====================================================
-    // ALREADY REGISTERED
+    // STRICT AUTH CHECK
     // =====================================================
 
-    if (
-        localStorage.getItem(USER_KEY) &&
-        localStorage.getItem(ACCESS_KEY)
-    ) {
+    const username =
+        localStorage.getItem(USER_KEY);
+
+    const accessKey =
+        localStorage.getItem(ACCESS_KEY);
+
+
+    // REGISTERED
+    if (username && accessKey) {
+
+        startMainCode();
+
         return;
     }
 
 
     // =====================================================
-    // NOT REGISTERED → HARD STOP
+    // NOT REGISTERED → STOP EVERYTHING
     // =====================================================
 
-    if (window.__fpyAuthRunning) {
+    if (document.getElementById("fpy-auth-overlay")) {
         return;
     }
 
-    window.__fpyAuthRunning = true;
+
+    const overlay =
+        document.createElement("div");
+
+    overlay.id =
+        "fpy-auth-overlay";
 
 
-    function handleAuth(event) {
-
-        if (
-            event.data?.type !== "FPY_AUTH_SUCCESS"
-        ) {
-            return;
-        }
-
-
-        const username =
-            String(
-                event.data.username || ""
-            ).trim();
-
-        const accessKey =
-            String(
-                event.data.accessKey || ""
-            ).trim();
+    overlay.style.cssText = `
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.75);
+        z-index:9999999999;
+        display:flex;
+        justify-content:center;
+        align-items:flex-start;
+        padding-top:60px;
+    `;
 
 
-        if (!username || !accessKey) {
-            return;
-        }
+    overlay.innerHTML = `
+        <div style="
+            width:420px;
+            max-width:90vw;
+            background:#1f1f1f;
+            border-radius:22px;
+            padding:25px;
+            box-sizing:border-box;
+            box-shadow:0 20px 60px rgba(0,0,0,.5);
+            position:relative;
+        ">
+
+            <button id="fpy-close-btn" style="
+                position:absolute;
+                right:12px;
+                top:12px;
+                width:32px;
+                height:32px;
+                border:none;
+                border-radius:50%;
+                cursor:pointer;
+                color:white;
+                background:rgba(255,255,255,.08);
+            ">✕</button>
+
+            <div style="
+                font-size:40px;
+                text-align:center;
+                margin-bottom:10px;
+            ">🔐</div>
+
+            <h2 style="
+                color:white;
+                text-align:center;
+                margin:0 0 5px;
+            ">
+                Automation Access
+            </h2>
+
+            <div style="
+                color:#aaa;
+                text-align:center;
+                margin-bottom:20px;
+                font-size:13px;
+            ">
+                One-time registration only
+            </div>
+
+            <input
+                id="fpy-username"
+                placeholder="Username"
+                style="
+                    width:100%;
+                    padding:14px 16px;
+                    margin-bottom:15px;
+                    border-radius:999px;
+                    border:1px solid rgba(255,255,255,.15);
+                    background:rgba(255,255,255,.08);
+                    color:white;
+                    box-sizing:border-box;
+                "
+            >
+
+            <input
+                id="fpy-accesskey"
+                type="password"
+                placeholder="Access Key"
+                style="
+                    width:100%;
+                    padding:14px 16px;
+                    margin-bottom:15px;
+                    border-radius:999px;
+                    border:1px solid rgba(255,255,255,.15);
+                    background:rgba(255,255,255,.08);
+                    color:white;
+                    box-sizing:border-box;
+                "
+            >
+
+            <button
+                id="fpy-save-btn"
+                style="
+                    width:100%;
+                    border:none;
+                    border-radius:999px;
+                    padding:14px;
+                    cursor:pointer;
+                    color:white;
+                    font-weight:bold;
+                    background:linear-gradient(
+                        135deg,
+                        #0078d4,
+                        #00a2ff
+                    );
+                "
+            >
+                Save & Continue
+            </button>
+
+        </div>
+    `;
 
 
-        localStorage.setItem(
-            USER_KEY,
-            username
-        );
-
-        localStorage.setItem(
-            ACCESS_KEY,
-            accessKey
-        );
+    document.body.appendChild(overlay);
 
 
-        window.removeEventListener(
-            "message",
-            handleAuth
-        );
+    // Close = stay blocked
+    overlay
+        .querySelector("#fpy-close-btn")
+        .onclick = function () {
 
-        window.__fpyAuthRunning = false;
+            overlay.remove();
 
+            // IMPORTANT:
+            // Main code still does NOT run.
 
-        // Registration complete.
-        // The original code below CANNOT resume automatically.
-        // Therefore the bookmarklet must be clicked again.
-
-    }
+        };
 
 
-    window.addEventListener(
-        "message",
-        handleAuth
-    );
+    // Save registration
+    overlay
+        .querySelector("#fpy-save-btn")
+        .onclick = function () {
+
+            const newUsername =
+                overlay
+                    .querySelector("#fpy-username")
+                    .value
+                    .trim();
+
+            const newAccessKey =
+                overlay
+                    .querySelector("#fpy-accesskey")
+                    .value
+                    .trim();
 
 
-    const popup =
-        window.open(
-            ACCESS_PAGE,
-            "fpy_access",
-            "width=500,height=700,resizable=yes,scrollbars=yes"
-        );
+            if (!newUsername || !newAccessKey) {
+
+                alert(
+                    "Username and Access Key are required."
+                );
+
+                return;
+            }
 
 
-    if (!popup) {
+            localStorage.setItem(
+                USER_KEY,
+                newUsername
+            );
 
-        window.removeEventListener(
-            "message",
-            handleAuth
-        );
 
-        window.__fpyAuthRunning = false;
+            localStorage.setItem(
+                ACCESS_KEY,
+                newAccessKey
+            );
 
-        alert(
-            "Please allow pop-ups for this site, then click the bookmarklet again."
-        );
 
-        return;
-    }
+            overlay.remove();
 
+
+            // NO reload.
+            // Start the previously blocked code now.
+
+            startMainCode();
+
+        };
 
 })();
 
