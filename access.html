@@ -1,0 +1,410 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Automation Access</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(
+                    circle at top,
+                    #17365d 0%,
+                    #0d1725 45%,
+                    #070b11 100%
+                );
+            color: white;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 420px;
+            max-width: 100%;
+            background: rgba(25, 25, 30, 0.96);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow:
+                0 25px 80px rgba(0,0,0,.55),
+                0 0 0 1px rgba(255,255,255,.03);
+        }
+
+        .logo {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            font-size: 36px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #0078d4,
+                    #00a2ff
+                );
+            box-shadow:
+                0 12px 30px rgba(0,120,212,.30);
+        }
+
+        h1 {
+            margin: 0;
+            text-align: center;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            margin-top: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #9fa7b3;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .field {
+            margin-bottom: 15px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 7px;
+            color: #d8dce2;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .field input {
+            width: 100%;
+            height: 48px;
+            padding: 0 16px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 12px;
+            outline: none;
+            background: rgba(255,255,255,.06);
+            color: white;
+            font-size: 14px;
+            transition: .2s ease;
+        }
+
+        .field input::placeholder {
+            color: #7f8793;
+        }
+
+        .field input:focus {
+            border-color: #00a2ff;
+            background: rgba(255,255,255,.08);
+            box-shadow:
+                0 0 0 3px rgba(0,162,255,.12);
+        }
+
+        .button {
+            width: 100%;
+            height: 50px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            background:
+                linear-gradient(
+                    135deg,
+                    #0078d4,
+                    #00a2ff
+                );
+            box-shadow:
+                0 10px 25px rgba(0,120,212,.25);
+            transition: .2s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-1px);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            display: none;
+            margin-top: 15px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .message.error {
+            display: block;
+            background: rgba(244,67,54,.12);
+            border: 1px solid rgba(244,67,54,.25);
+            color: #ff8585;
+        }
+
+        .message.success {
+            display: block;
+            background: rgba(0,200,83,.12);
+            border: 1px solid rgba(0,200,83,.25);
+            color: #63efa2;
+        }
+
+        .footer {
+            margin-top: 18px;
+            text-align: center;
+            color: #737b87;
+            font-size: 11px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="card">
+
+        <div class="logo">
+            🔐
+        </div>
+
+        <h1>
+            Automation Access
+        </h1>
+
+        <div class="subtitle">
+            Register once to enable this automation.
+        </div>
+
+
+        <div class="field">
+
+            <label for="username">
+                Username
+            </label>
+
+            <input
+                id="username"
+                type="text"
+                placeholder="Enter username"
+                autocomplete="off"
+                spellcheck="false"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label for="accessKey">
+                Access Key
+            </label>
+
+            <input
+                id="accessKey"
+                type="password"
+                placeholder="Enter access key"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <button
+            id="continueBtn"
+            class="button"
+        >
+            Save & Continue
+        </button>
+
+
+        <div
+            id="message"
+            class="message"
+        ></div>
+
+
+        <div class="footer">
+            Your registration is stored by the bookmarklet.
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const usernameInput =
+            document.getElementById("username");
+
+        const accessKeyInput =
+            document.getElementById("accessKey");
+
+        const continueBtn =
+            document.getElementById("continueBtn");
+
+        const message =
+            document.getElementById("message");
+
+
+        function showMessage(text, type) {
+
+            message.textContent = text;
+
+            message.className =
+                "message " + type;
+
+        }
+
+
+        function closeAccessPage() {
+
+            window.close();
+
+        }
+
+
+        function submitAccess() {
+
+            const username =
+                usernameInput.value.trim();
+
+            const accessKey =
+                accessKeyInput.value.trim();
+
+
+            if (!username || !accessKey) {
+
+                showMessage(
+                    "Username and Access Key are required.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            continueBtn.disabled = true;
+
+            continueBtn.textContent =
+                "Saving...";
+
+
+            /*
+             * Send the credentials back to the
+             * bookmarklet that opened this page.
+             */
+
+            if (!window.opener) {
+
+                showMessage(
+                    "This page must be opened from the bookmarklet.",
+                    "error"
+                );
+
+                continueBtn.disabled = false;
+
+                continueBtn.textContent =
+                    "Save & Continue";
+
+                return;
+            }
+
+
+            window.opener.postMessage(
+                {
+                    type: "FPY_AUTH_SUCCESS",
+                    username: username,
+                    accessKey: accessKey
+                },
+                "*"
+            );
+
+
+            showMessage(
+                "Registration successful. You can close this window.",
+                "success"
+            );
+
+
+            setTimeout(function () {
+
+                try {
+                    window.close();
+                } catch (e) {
+                    // Ignore browser restrictions.
+                }
+
+            }, 500);
+
+        }
+
+
+        continueBtn.addEventListener(
+            "click",
+            submitAccess
+        );
+
+
+        accessKeyInput.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Enter") {
+                    submitAccess();
+                }
+
+            }
+        );
+
+
+        usernameInput.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Enter") {
+                    accessKeyInput.focus();
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>
