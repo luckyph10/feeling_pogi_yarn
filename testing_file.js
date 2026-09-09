@@ -1,387 +1,346 @@
-(function () {
 
-    runScript();
+(function () {
+    const USER_KEY = "disputeUser";
+    const STATUS_KEY = "disputeReviewStatus";
+
+    const DRS_OPTIONS = [
+        "Plan Type Validated Post IDR Initiation",
+        "VOB verified, no change to NSA jurisdiction",
+        "VOB pending",
+        "VOB verified dispute is not valid under NSA jurisdiction, requested closure",
+        "Additional Info provided to IDRE through email"
+    ];
+
+    initialize();
+
+    // ================= INITIALIZE =================
+
+    function initialize() {
+        const savedUser = localStorage.getItem(USER_KEY);
+        const savedStatus = localStorage.getItem(STATUS_KEY);
+
+        if (savedUser && savedStatus) {
+            showMiniPanel();
+            runScript();
+        } else {
+            createPanel();
+        }
+    }
+
+    // ================= MINI PANEL =================
+
+    function showMiniPanel() {
+        const existing = document.getElementById("dispute-mini-panel");
+
+        if (existing) {
+            existing.remove();
+        }
+
+        const mini = document.createElement("div");
+
+        mini.id = "dispute-mini-panel";
+
+        mini.style.cssText = `
+            position:fixed;
+            top:10px;
+            left:10px;
+            z-index:999999;
+            background:rgba(0,0,0,.85);
+            color:white;
+            padding:8px 12px;
+            border-radius:10px;
+            font-family:Arial,sans-serif;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            box-shadow:0 4px 20px rgba(0,0,0,.5);
+            transition:opacity .5s;
+        `;
+
+        mini.innerHTML = `
+            <span style="font-size:12px;">✓ Saved</span>
+
+            <button
+                id="mini-edit-btn"
+                style="
+                    border:none;
+                    padding:5px 10px;
+                    border-radius:6px;
+                    background:#ff9800;
+                    color:white;
+                    cursor:pointer;
+                    font-weight:bold;
+                "
+            >
+                Edit
+            </button>
+        `;
+
+        document.body.appendChild(mini);
+
+        document
+            .getElementById("mini-edit-btn")
+            .addEventListener("click", function () {
+                mini.remove();
+                createPanel();
+            });
+
+        setTimeout(function () {
+            mini.style.opacity = "0";
+
+            setTimeout(function () {
+                if (mini.parentNode) {
+                    mini.remove();
+                }
+            }, 500);
+        }, 2000);
+    }
+
+    // ================= SETTINGS PANEL =================
+
+    function createPanel() {
+        const oldPanel = document.getElementById("dispute-settings-panel");
+
+        if (oldPanel) {
+            oldPanel.remove();
+        }
+
+        const savedUser = localStorage.getItem(USER_KEY) || "";
+        const savedStatus = localStorage.getItem(STATUS_KEY) || "";
+
+        const panel = document.createElement("div");
+
+        panel.id = "dispute-settings-panel";
+
+        panel.style.cssText = `
+            position:fixed;
+            top:10px;
+            left:10px;
+            width:360px;
+            background:rgba(0,0,0,.9);
+            color:white;
+            padding:18px;
+            border-radius:12px;
+            z-index:999999;
+            font-family:Arial,sans-serif;
+            box-shadow:0 6px 25px rgba(0,0,0,.6);
+            backdrop-filter:blur(8px);
+        `;
+
+        const options = DRS_OPTIONS.map(function (item) {
+            return `
+                <option value="${item}">
+                    ${item}
+                </option>
+            `;
+        }).join("");
+
+        panel.innerHTML = `
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:15px;
+            ">
+                <div style="
+                    font-size:18px;
+                    font-weight:bold;
+                ">
+                    Dispute Settings
+                </div>
+
+                <div style="
+                    color:${savedUser && savedStatus ? "#00ff66" : "#ff5555"};
+                    font-size:12px;
+                ">
+                    ${savedUser && savedStatus ? "Saved ✓" : "Required"}
+                </div>
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <div style="
+                    margin-bottom:5px;
+                    font-size:13px;
+                ">
+                    Dispute User
+                </div>
+
+                <input
+                    id="dispute-user"
+                    value="${savedUser}"
+                    style="
+                        width:100%;
+                        padding:10px;
+                        border:none;
+                        border-radius:8px;
+                        box-sizing:border-box;
+                    "
+                >
+            </div>
+
+            <div style="margin-bottom:15px;">
+                <div style="
+                    margin-bottom:5px;
+                    font-size:13px;
+                ">
+                    Dispute Review Status
+                </div>
+
+                <select
+                    id="dispute-status"
+                    style="
+                        width:100%;
+                        padding:10px;
+                        border:none;
+                        border-radius:8px;
+                        box-sizing:border-box;
+                    "
+                >
+                    <option value="">
+                        Select DRS...
+                    </option>
+
+                    ${options}
+                </select>
+            </div>
+
+            <div style="
+                display:flex;
+                gap:10px;
+            ">
+                <button
+                    id="save-dispute-settings"
+                    style="
+                        flex:1;
+                        border:none;
+                        padding:10px;
+                        border-radius:8px;
+                        background:#00c853;
+                        color:white;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
+                >
+                    Save
+                </button>
+
+                <button
+                    id="close-dispute-settings"
+                    style="
+                        flex:1;
+                        border:none;
+                        padding:10px;
+                        border-radius:8px;
+                        background:#f44336;
+                        color:white;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
+                >
+                    Close
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(panel);
+
+        const userInput = document.getElementById("dispute-user");
+        const statusInput = document.getElementById("dispute-status");
+
+        statusInput.value = savedStatus;
+
+        document
+            .getElementById("save-dispute-settings")
+            .addEventListener("click", function () {
+                const user = userInput.value.trim();
+                const status = statusInput.value;
+
+                if (!user || !status) {
+                    alert(
+                        "You must set both Dispute User and Dispute Review Status before continuing."
+                    );
+
+                    return;
+                }
+
+                localStorage.setItem(USER_KEY, user);
+                localStorage.setItem(STATUS_KEY, status);
+
+                panel.remove();
+
+                showMiniPanel();
+
+                runScript();
+            });
+
+        document
+            .getElementById("close-dispute-settings")
+            .addEventListener("click", function () {
+                if (
+                    localStorage.getItem(USER_KEY) &&
+                    localStorage.getItem(STATUS_KEY)
+                ) {
+                    panel.remove();
+                } else {
+                    alert(
+                        "You must save the settings before closing."
+                    );
+                }
+            });
+    }
+
+    // ================= INPUT FILL =================
+
+    function fill(selector, value) {
+        const element = document.querySelector(selector);
+
+        if (!element) {
+            return false;
+        }
+
+        element.focus();
+
+        element.value = value;
+
+        element.dispatchEvent(
+            new Event("input", {
+                bubbles: true
+            })
+        );
+
+        element.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "Enter",
+                code: "Enter",
+                keyCode: 13,
+                which: 13,
+                bubbles: true
+            })
+        );
+
+        return true;
+    }
+
+    // ================= MAIN SCRIPT =================
 
     function runScript() {
+        const disputeUser = localStorage.getItem(USER_KEY);
+        const disputeStatus = localStorage.getItem(STATUS_KEY);
 
-        const el =
-            document.querySelector('#ngForm > fieldset > div:nth-child(1) > div:nth-child(1) > div:nth-child(6) > textarea') ||
-            document.querySelector('#ngForm > fieldset > div:nth-child(1) > div:nth-child(1) > div:nth-child(7) > textarea');
-
-        if (!el) {
-            alert('Textarea not found');
+        if (!disputeUser || !disputeStatus) {
             return;
         }
 
-        const comments = [
-            'VOB verified, no change to NSA jurisdiction',
-            'Completed: VOB verified. Dispute status is closed. Payment determination is uploaded.',
-            'Ineligible to Submit: Case was withdrawn by HaloMD.',
-            'Ineligible to Submit: Case (Ineligibility reason)',
-            'Ineligible to Submit: Government Plan.',
-            'Ineligible to Submit: Patient is not over 65 years old, Insurance Type is Medicaid.',
-            'Ineligible to Submit: Patient is over 65 years old. Primary Payer: Medicare.',
-            'Ineligible to Submit: Ineligible Plan.',
-            'Ineligible to Submit: Provider is in-Network.',
-            'Ineligible to Submit: State Arbitration.',
-            'Ineligible to Submit: Self Pay Plan type.',
-            'Ineligible to Submit: Plan type did not match.',
-            'Ineligible to Submit: State-based marketplace-State.',
-            'Ineligible to Submit: Self-Funded Opt - In.',
-            'Ineligible to Submit:Unable to find withdrawn email.',
-            'Ineligible to Submit: Case (Unable to find evidence for INN)',
-            'Ineligible to Submit: DRS: Closure Request Submitted. Closure team has already received a closure request.',
-            'Pending Onshore Review: Dispute Status Closed. Patient over 65 years old, VOB is not available. Final payment determination uploaded.',
-            'Pending Onshore Review: Incomplete ING evidence.',
-            'Pending Onshore Review: Unable to update the dispute tracker c/o Lillian Madison.',
-            'Pending Onshore Review: Plan type is Self funded, Policy Type is Medicaid.',
-            'Dispute is pending VOB: No VOB checkmark AND no case notes confirming plan type.',
-            'Dispute is Pending:  Incomplete eligible evidence.',
-            'Dispute is pending VOB: The patient is over 65 years old. Unable to determine primary payer - VOB is not available.',
-            'Dispute is pending VOB: Technical Error.',
-            'Dispute is pending VOB: 100% of billed charges went to PR indicated in Ineligibility reason in Arbit.',
-            'Dispute is Pending: No Plan Type Indicated in Arbit.',
-            'Resubmission: CPT codes submitted for resubmission noted in case comments. Awaiting verification.',
-            'Resubmission: CPT codes deleted for resubmission.Resubmitted dispute number available.'
-        ];
+        const ownerSelector =
+            "#ngForm > fieldset > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > ng-select > div > div > div.ng-input > input[type=text]";
 
-        const oldPopup = document.getElementById('aldCommentPopup');
+        const noteSelector =
+            "#ngForm > fieldset > div:nth-child(1) > div:nth-child(1) > div:nth-child(4) > ng-select > div > div > div.ng-input > input[type=text]";
 
-        if (oldPopup) {
-            oldPopup.remove();
-        }
+        fill(ownerSelector, disputeUser);
 
-        const popup = document.createElement('div');
-
-        popup.id = 'aldCommentPopup';
-
-        popup.style.cssText =
-            'position:fixed;' +
-            'top:50%;' +
-            'left:50%;' +
-            'transform:translate(-50%,-50%);' +
-            'width:1100px;' +
-            'max-width:95vw;' +
-            'max-height:85vh;' +
-            'overflow:auto;' +
-            'background:#ffffff;' +
-            'border:4px solid #333;' +
-            'padding:15px;' +
-            'z-index:999999;' +
-            'font-family:Arial,sans-serif;' +
-            'border-radius:10px;' +
-            'box-shadow:0 0 25px rgba(0,0,0,.5);';
-
-        popup.innerHTML =
-            '<div style="font-size:26px;font-weight:900;color:#000;text-align:center;margin-bottom:15px;">VOB COMMENTS</div>';
-
-        const initialsWrap = document.createElement('div');
-
-        initialsWrap.style.cssText =
-            'position:absolute;' +
-            'top:10px;' +
-            'left:10px;' +
-            'display:flex;' +
-            'align-items:center;' +
-            'gap:5px;';
-
-        const initialsInput = document.createElement('input');
-
-        initialsInput.type = 'text';
-        initialsInput.placeholder = 'Initials';
-        initialsInput.maxLength = 10;
-        initialsInput.value =
-            localStorage.getItem('vobCommentInitials') || 'ALD';
-
-        initialsInput.style.cssText =
-            'width:80px;' +
-            'padding:6px;' +
-            'border:1px solid #333;' +
-            'border-radius:4px;' +
-            'font-weight:bold;' +
-            'text-transform:uppercase;';
-
-        const saveBtn = document.createElement('button');
-
-        saveBtn.textContent = 'Save';
-
-        saveBtn.style.cssText =
-            'padding:6px 10px;' +
-            'background:#1976d2;' +
-            'color:#fff;' +
-            'border:none;' +
-            'border-radius:4px;' +
-            'cursor:pointer;' +
-            'font-weight:bold;';
-
-        saveBtn.onclick = function () {
-
-            const val = initialsInput.value
-                .trim()
-                .toUpperCase();
-
-            if (!val) {
-                alert('Enter initials first.');
-                return;
-            }
-
-            localStorage.setItem(
-                'vobCommentInitials',
-                val
-            );
-
-            alert('Initials saved: ' + val);
-        };
-
-        initialsWrap.appendChild(initialsInput);
-        initialsWrap.appendChild(saveBtn);
-
-        popup.appendChild(initialsWrap);
-
-        // Specific AppID checkbox - default unchecked
-        const appIdWrap = document.createElement('div');
-
-        appIdWrap.style.cssText =
-            'position:absolute;' +
-            'top:10px;' +
-            'right:60px;' +
-            'display:flex;' +
-            'align-items:center;' +
-            'gap:6px;' +
-            'background:#fff;' +
-            'padding:4px 6px;' +
-            'border-radius:4px;' +
-            'font-family:Arial,sans-serif;' +
-            'font-size:14px;' +
-            'font-weight:900;' +
-            'color:#000;';
-
-        const appIdCheckbox = document.createElement('input');
-
-        appIdCheckbox.type = 'checkbox';
-        appIdCheckbox.id = 'specificAppIdCheckbox';
-        appIdCheckbox.checked = false;
-
-        appIdCheckbox.style.cssText =
-            'margin:0;' +
-            'width:16px;' +
-            'height:16px;' +
-            'cursor:pointer;';
-
-        const appIdLabel = document.createElement('label');
-
-        appIdLabel.htmlFor = 'specificAppIdCheckbox';
-        appIdLabel.textContent = 'Specific AppID';
-        appIdLabel.style.cssText =
-            'cursor:pointer;' +
-            'user-select:none;';
-
-        appIdWrap.appendChild(appIdCheckbox);
-        appIdWrap.appendChild(appIdLabel);
-
-        popup.appendChild(appIdWrap);
-
-        const topClose = document.createElement('button');
-
-        topClose.textContent = '✕';
-
-        topClose.style.cssText =
-            'position:absolute;' +
-            'top:10px;' +
-            'right:10px;' +
-            'width:40px;' +
-            'height:40px;' +
-            'background:#333;' +
-            'color:#fff;' +
-            'font-weight:900;' +
-            'font-size:22px;' +
-            'border:none;' +
-            'border-radius:6px;' +
-            'cursor:pointer;';
-
-        topClose.onclick = function () {
-            popup.remove();
-        };
-
-        popup.appendChild(topClose);
-
-        comments.forEach(txt => {
-            const btn = document.createElement('button');
-
-            let bg = '#f0f0f0';
-
-            if (txt.startsWith('Ineligible to Submit:')) {
-                bg = '#ff8080';
-            } else if (
-                txt.startsWith('Dispute is pending VOB:') ||
-                txt === 'Dispute is Pending: No Plan Type Indicated in Arbit.'
-            ) {
-                bg = '#fff176';
-            } else if (txt.startsWith('Pending Onshore Review:')) {
-                bg = '#ffb6e6';
-            }
-
-            btn.style.cssText =
-                'display:block;' +
-                'width:100%;' +
-                'text-align:left;' +
-                'margin:4px 0;' +
-                'padding:10px;' +
-                'border:2px solid #666;' +
-                'border-radius:6px;' +
-                'background:' + bg + ';' +
-                'cursor:pointer;' +
-                'font-weight:900;' +
-                'color:#000000;' +
-                'font-size:16px;' +
-                'line-height:1.4;';
-
-            btn.textContent = txt;
-
-            btn.onclick = function () {
-
-                let finalComment = txt;
-
-                if (txt === 'Ineligible to Submit: Case (Ineligibility reason)') {
-
-                    const reason = prompt(
-                        'Enter the Ineligibility reason:',
-                        ''
-                    );
-
-                    if (reason === null) {
-                        return;
-                    }
-
-                    if (reason.trim() === '') {
-                        return;
-                    }
-
-                    finalComment =
-                        'Ineligible to Submit: Case (' +
-                        reason.trim() +
-                        ')';
-                }
-
-                const existingText = el.value || '';
-
-                if (existingText.includes(finalComment)) {
-
-                    const proceed = confirm(
-                        'WARNING:\n\n' +
-                        'This comment already exists in the comment box.\n\n' +
-                        'Do you want to proceed anyway?'
-                    );
-
-                    if (!proceed) {
-                        return;
-                    }
-                }
-
-                // Ask for AppID only when Specific AppID is checked
-                let appIdText = '';
-
-                if (appIdCheckbox.checked) {
-
-                    const appId = prompt(
-                        'Enter the AppID:',
-                        ''
-                    );
-
-                    if (appId === null) {
-                        return;
-                    }
-
-                    if (appId.trim() === '') {
-                        return;
-                    }
-
-                    appIdText = '(APPID ' + appId.trim() + ') ';
-                }
-
-                const d = new Date();
-
-                const mm = String(
-                    d.getMonth() + 1
-                ).padStart(2, '0');
-
-                const dd = String(
-                    d.getDate()
-                ).padStart(2, '0');
-
-                const yy = String(
-                    d.getFullYear()
-                ).slice(-2);
-
-                const initials =
-                    (
-                        localStorage.getItem('vobCommentInitials') ||
-                        'ALD'
-                    )
-                    .trim()
-                    .toUpperCase();
-
-                const note =
-                    `${mm}/${dd}/${yy} ${appIdText}${finalComment} - ${initials}`;
-
-                el.value =
-                    note +
-                    (
-                        el.value.trim()
-                            ? '\n\n' + el.value
-                            : ''
-                    );
-
-                el.dispatchEvent(
-                    new Event(
-                        'input',
-                        { bubbles: true }
-                    )
-                );
-
-                el.dispatchEvent(
-                    new Event(
-                        'change',
-                        { bubbles: true }
-                    )
-                );
-
-                popup.remove();
-            };
-
-            btn.onmouseover = function () {
-                this.style.filter = 'brightness(95%)';
-            };
-
-            btn.onmouseout = function () {
-                this.style.filter = 'brightness(100%)';
-            };
-
-            popup.appendChild(btn);
-        });
-
-        const close = document.createElement('button');
-
-        close.textContent = 'CLOSE';
-
-        close.style.cssText =
-            'margin-top:10px;' +
-            'padding:10px 25px;' +
-            'background:#333;' +
-            'color:#fff;' +
-            'font-weight:900;' +
-            'font-size:15px;' +
-            'border:none;' +
-            'border-radius:6px;' +
-            'cursor:pointer;';
-
-        close.onclick = function () {
-            popup.remove();
-        };
-
-        popup.appendChild(close);
-
-        document.body.appendChild(popup);
+        setTimeout(function () {
+            fill(noteSelector, disputeStatus);
+        }, 0);
     }
-
 })();
