@@ -59,29 +59,26 @@
     }
 
     try {
-        const label = [...document.querySelectorAll("*")]
-            .find(el => el.textContent.trim() === "DISPUTE NUMBER");
-
-        if (!label) {
-            showToast("DISPUTE NUMBER not found", false);
-            return;
-        }
-
         let disputeNumber = "";
 
-        if (label.nextElementSibling) {
-            disputeNumber = label.nextElementSibling.textContent.trim();
+        // Look for DISP-######## pattern in visible elements
+        const elements = document.querySelectorAll("*");
+
+        for (const el of elements) {
+            const text = el.textContent?.trim();
+
+            if (/^DISP-\d+$/i.test(text)) {
+                disputeNumber = text;
+                break;
+            }
         }
 
-        if (!disputeNumber && label.parentElement) {
-            const items = [...label.parentElement.querySelectorAll("*")]
-                .map(el => el.textContent.trim())
-                .filter(Boolean);
+        // Fallback: search entire page text
+        if (!disputeNumber) {
+            const match = document.body.innerText.match(/DISP-\d+/i);
 
-            const idx = items.indexOf("DISPUTE NUMBER");
-
-            if (idx > -1 && items[idx + 1]) {
-                disputeNumber = items[idx + 1];
+            if (match) {
+                disputeNumber = match[0];
             }
         }
 
@@ -95,7 +92,8 @@
                 showToast(`Copied: ${disputeNumber}`, true);
                 console.log("Dispute Number:", disputeNumber);
             })
-            .catch(() => {
+            .catch(err => {
+                console.error(err);
                 showToast("Clipboard copy failed", false);
             });
 
@@ -104,7 +102,6 @@
         showToast("Script error", false);
     }
 })();
-
 
 
 
