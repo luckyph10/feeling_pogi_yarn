@@ -4271,7 +4271,7 @@ overlay.addEventListener(
             e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
-            e.key==="2"
+            e.code==="Digit2"
         ){
 
             e.preventDefault();
@@ -4299,30 +4299,45 @@ overlay.addEventListener(
         }
 
 
-       if(
-    !e.ctrlKey &&
-    e.altKey &&
-    !e.metaKey &&
-    !e.shiftKey &&
-    e.code==="Digit0" &&
-    eligible.style.display==="block"
-){
+        if(
+            !e.ctrlKey &&
+            e.altKey &&
+            !e.metaKey &&
+            !e.shiftKey &&
+            e.code==="Digit3"
+        ){
 
-    e.preventDefault();
-    e.stopPropagation();
+            e.preventDefault();
+            e.stopPropagation();
 
-    noBtn.click();
+            duplicateCommentsInput.value=
+                "Duplicate Dispute Reviewed";
 
-    return;
 
-}
+            duplicateCommentsInput.dispatchEvent(
+                new Event(
+                    "change",
+                    {
+                        bubbles:true
+                    }
+                )
+            );
+
+
+            status.textContent=
+                "Duplicate Dispute Comments: Duplicate Dispute Reviewed";
+
+            return;
+
+        }
+
 
         if(
             !e.ctrlKey &&
             e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
-            e.key==="4"
+            e.code==="Digit4"
         ){
 
             e.preventDefault();
@@ -4355,7 +4370,7 @@ overlay.addEventListener(
             e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
-            e.key==="5"
+            e.code==="Digit5"
         ){
 
             e.preventDefault();
@@ -4398,11 +4413,11 @@ overlay.addEventListener(
 
 
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            !e.ctrlKey &&
+            e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
-            e.key==="0" &&
+            e.code==="Digit0" &&
             eligible.style.display==="block"
         ){
 
@@ -4421,7 +4436,7 @@ overlay.addEventListener(
             e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
-            e.key==="1" &&
+            e.code==="Digit1" &&
             eligible.style.display==="block"
         ){
 
@@ -4437,6 +4452,7 @@ overlay.addEventListener(
     },
     true
 );
+
 
 /* =========================================================
    CLOSE
