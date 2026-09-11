@@ -4299,38 +4299,23 @@ overlay.addEventListener(
         }
 
 
-        if(
-            !e.ctrlKey &&
-            e.altKey &&
-            !e.metaKey &&
-            !e.shiftKey &&
-            e.key==="3"
-        ){
+       if(
+    !e.ctrlKey &&
+    e.altKey &&
+    !e.metaKey &&
+    !e.shiftKey &&
+    e.code==="Digit0" &&
+    eligible.style.display==="block"
+){
 
-            e.preventDefault();
-            e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
 
-            duplicateCommentsInput.value=
-                "Duplicate Dispute Reviewed";
+    noBtn.click();
 
+    return;
 
-            duplicateCommentsInput.dispatchEvent(
-                new Event(
-                    "change",
-                    {
-                        bubbles:true
-                    }
-                )
-            );
-
-
-            status.textContent=
-                "Duplicate Dispute Comments: Duplicate Dispute Reviewed";
-
-            return;
-
-        }
-
+}
 
         if(
             !e.ctrlKey &&
