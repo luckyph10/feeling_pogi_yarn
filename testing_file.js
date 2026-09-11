@@ -4266,9 +4266,41 @@ overlay.addEventListener(
     "keydown",
     e=>{
 
+        /* ALT + 1 = Duplicate Comments -> N/A */
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            e.altKey &&
+            !e.ctrlKey &&
+            !e.metaKey &&
+            !e.shiftKey &&
+            e.key==="1"
+        ){
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            duplicateCommentsInput.value =
+                "N/A";
+
+            duplicateCommentsInput.dispatchEvent(
+                new Event(
+                    "change",
+                    {
+                        bubbles:true
+                    }
+                )
+            );
+
+            status.textContent =
+                "Duplicate Dispute Comments: N/A";
+
+            return;
+        }
+
+
+        /* ALT + 2 = Duplicate Dispute Reviewed */
+        if(
+            e.altKey &&
+            !e.ctrlKey &&
             !e.metaKey &&
             !e.shiftKey &&
             e.key==="2"
@@ -4277,9 +4309,8 @@ overlay.addEventListener(
             e.preventDefault();
             e.stopPropagation();
 
-            duplicateCommentsInput.value=
-                "N/A";
-
+            duplicateCommentsInput.value =
+                "Duplicate Dispute Reviewed";
 
             duplicateCommentsInput.dispatchEvent(
                 new Event(
@@ -4290,18 +4321,17 @@ overlay.addEventListener(
                 )
             );
 
-
-            status.textContent=
-                "Duplicate Dispute Comments: N/A";
+            status.textContent =
+                "Duplicate Dispute Comments: Duplicate Dispute Reviewed";
 
             return;
-
         }
 
 
+        /* ALT + 3 = Plantype Mismatch NO */
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            e.altKey &&
+            !e.ctrlKey &&
             !e.metaKey &&
             !e.shiftKey &&
             e.key==="3"
@@ -4310,11 +4340,10 @@ overlay.addEventListener(
             e.preventDefault();
             e.stopPropagation();
 
-            duplicateCommentsInput.value=
-                "Duplicate Dispute Reviewed";
+            mismatchInput.value =
+                "No";
 
-
-            duplicateCommentsInput.dispatchEvent(
+            mismatchInput.dispatchEvent(
                 new Event(
                     "change",
                     {
@@ -4323,18 +4352,17 @@ overlay.addEventListener(
                 )
             );
 
-
-            status.textContent=
-                "Duplicate Dispute Comments: Duplicate Dispute Reviewed";
+            status.textContent =
+                "Plantype Mismatch: No";
 
             return;
-
         }
 
 
+        /* ALT + 4 = Plantype Mismatch YES */
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            e.altKey &&
+            !e.ctrlKey &&
             !e.metaKey &&
             !e.shiftKey &&
             e.key==="4"
@@ -4343,43 +4371,9 @@ overlay.addEventListener(
             e.preventDefault();
             e.stopPropagation();
 
-            mismatchInput.value=
-                "No";
-
-
-            mismatchInput.dispatchEvent(
-                new Event(
-                    "change",
-                    {
-                        bubbles:true
-                    }
-                )
-            );
-
-
-            status.textContent=
-                "Plantype Mismatch: No";
-
-            return;
-
-        }
-
-
-        if(
-            e.ctrlKey &&
-            !e.altKey &&
-            !e.metaKey &&
-            !e.shiftKey &&
-            e.key==="5"
-        ){
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            mismatchInput.value=
+            mismatchInput.value =
                 "Yes";
 
-
             mismatchInput.dispatchEvent(
                 new Event(
                     "change",
@@ -4389,12 +4383,10 @@ overlay.addEventListener(
                 )
             );
 
-
-            status.textContent=
+            status.textContent =
                 "Plantype Mismatch: Yes";
 
             return;
-
         }
 
 
@@ -4408,13 +4400,13 @@ overlay.addEventListener(
             resolve(null);
 
             return;
-
         }
 
 
+        /* ALT + 0 = NO */
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            e.altKey &&
+            !e.ctrlKey &&
             !e.metaKey &&
             !e.shiftKey &&
             e.key==="0" &&
@@ -4427,16 +4419,16 @@ overlay.addEventListener(
             noBtn.click();
 
             return;
-
         }
 
 
+        /* ALT + 5 = YES */
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            e.altKey &&
+            !e.ctrlKey &&
             !e.metaKey &&
             !e.shiftKey &&
-            e.key==="1" &&
+            e.key==="5" &&
             eligible.style.display==="block"
         ){
 
@@ -4446,7 +4438,6 @@ overlay.addEventListener(
             yesBtn.click();
 
             return;
-
         }
 
     },
