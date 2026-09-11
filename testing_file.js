@@ -4259,23 +4259,23 @@ continueBtn.onclick=async()=>{
 
 
 /* =========================================================
-   KEYBOARD SHORTCUTS (ALT + Z X C V B)
+   KEYBOARD SHORTCUTS (CTRL + ALT + 1 2 3 4 5)
    ========================================================= */
 
 overlay.addEventListener(
     "keydown",
     e=>{
 
-        const altOnly =
+        const ctrlAlt =
+            e.ctrlKey &&
             e.altKey &&
-            !e.ctrlKey &&
-            !e.metaKey &&
-            !e.shiftKey;
+            !e.shiftKey &&
+            !e.metaKey;
 
-        /* ALT + Z = N/A */
+        /* CTRL + ALT + 1 = N/A */
         if(
-            altOnly &&
-            e.code==="KeyZ"
+            ctrlAlt &&
+            e.code==="Digit1"
         ){
 
             e.preventDefault();
@@ -4298,10 +4298,10 @@ overlay.addEventListener(
         }
 
 
-        /* ALT + X = Duplicate Dispute Reviewed */
+        /* CTRL + ALT + 2 = Duplicate Dispute Reviewed */
         if(
-            altOnly &&
-            e.code==="KeyX"
+            ctrlAlt &&
+            e.code==="Digit2"
         ){
 
             e.preventDefault();
@@ -4324,10 +4324,10 @@ overlay.addEventListener(
         }
 
 
-        /* ALT + C = Plantype Mismatch NO */
+        /* CTRL + ALT + 3 = Plantype Mismatch NO */
         if(
-            altOnly &&
-            e.code==="KeyC"
+            ctrlAlt &&
+            e.code==="Digit3"
         ){
 
             e.preventDefault();
@@ -4350,10 +4350,10 @@ overlay.addEventListener(
         }
 
 
-        /* ALT + V = Plantype Mismatch YES */
+        /* CTRL + ALT + 4 = Plantype Mismatch YES */
         if(
-            altOnly &&
-            e.code==="KeyV"
+            ctrlAlt &&
+            e.code==="Digit4"
         ){
 
             e.preventDefault();
@@ -4376,10 +4376,10 @@ overlay.addEventListener(
         }
 
 
-        /* ALT + B = YES */
+        /* CTRL + ALT + 5 = YES */
         if(
-            altOnly &&
-            e.code==="KeyB" &&
+            ctrlAlt &&
+            e.code==="Digit5" &&
             eligible.style.display==="block"
         ){
 
@@ -4392,10 +4392,10 @@ overlay.addEventListener(
         }
 
 
-        /* ALT + N = NO */
+        /* CTRL + ALT + 0 = NO */
         if(
-            altOnly &&
-            e.code==="KeyN" &&
+            ctrlAlt &&
+            e.code==="Digit0" &&
             eligible.style.display==="block"
         ){
 
@@ -4423,7 +4423,6 @@ overlay.addEventListener(
     },
     true
 );
-
 
 /* =========================================================
    CLOSE
