@@ -4257,38 +4257,26 @@ continueBtn.onclick=async()=>{
 
 };
 
-
 /* =========================================================
-   KEYBOARD SHORTCUTS (CTRL + ALT + 1 2 3 4 5)
+   KEYBOARD SHORTCUTS
+   SHIFT+0 SHIFT+1 SHIFT+2 SHIFT+3 SHIFT+4 SHIFT+5
+   ENTER
    ========================================================= */
 
 overlay.addEventListener(
     "keydown",
-    e=>{
+    e => {
 
-        const ctrlAlt =
-            e.ctrlKey &&
-            e.altKey &&
-            !e.shiftKey &&
-            !e.metaKey;
-
-        /* CTRL + ALT + 1 = N/A */
-        if(
-            ctrlAlt &&
-            e.code==="Digit1"
-        ){
+        /* Shift + 1 = N/A */
+        if (e.shiftKey && e.code === "Digit1") {
 
             e.preventDefault();
             e.stopPropagation();
 
-            duplicateCommentsInput.value =
-                "N/A";
+            duplicateCommentsInput.value = "N/A";
 
             duplicateCommentsInput.dispatchEvent(
-                new Event(
-                    "change",
-                    { bubbles:true }
-                )
+                new Event("change", { bubbles: true })
             );
 
             status.textContent =
@@ -4297,12 +4285,8 @@ overlay.addEventListener(
             return;
         }
 
-
-        /* CTRL + ALT + 2 = Duplicate Dispute Reviewed */
-        if(
-            ctrlAlt &&
-            e.code==="Digit2"
-        ){
+        /* Shift + 2 = Duplicate Dispute Reviewed */
+        if (e.shiftKey && e.code === "Digit2") {
 
             e.preventDefault();
             e.stopPropagation();
@@ -4311,10 +4295,7 @@ overlay.addEventListener(
                 "Duplicate Dispute Reviewed";
 
             duplicateCommentsInput.dispatchEvent(
-                new Event(
-                    "change",
-                    { bubbles:true }
-                )
+                new Event("change", { bubbles: true })
             );
 
             status.textContent =
@@ -4323,24 +4304,16 @@ overlay.addEventListener(
             return;
         }
 
-
-        /* CTRL + ALT + 3 = Plantype Mismatch NO */
-        if(
-            ctrlAlt &&
-            e.code==="Digit3"
-        ){
+        /* Shift + 3 = Plantype Mismatch NO */
+        if (e.shiftKey && e.code === "Digit3") {
 
             e.preventDefault();
             e.stopPropagation();
 
-            mismatchInput.value =
-                "No";
+            mismatchInput.value = "No";
 
             mismatchInput.dispatchEvent(
-                new Event(
-                    "change",
-                    { bubbles:true }
-                )
+                new Event("change", { bubbles: true })
             );
 
             status.textContent =
@@ -4349,24 +4322,16 @@ overlay.addEventListener(
             return;
         }
 
-
-        /* CTRL + ALT + 4 = Plantype Mismatch YES */
-        if(
-            ctrlAlt &&
-            e.code==="Digit4"
-        ){
+        /* Shift + 4 = Plantype Mismatch YES */
+        if (e.shiftKey && e.code === "Digit4") {
 
             e.preventDefault();
             e.stopPropagation();
 
-            mismatchInput.value =
-                "Yes";
+            mismatchInput.value = "Yes";
 
             mismatchInput.dispatchEvent(
-                new Event(
-                    "change",
-                    { bubbles:true }
-                )
+                new Event("change", { bubbles: true })
             );
 
             status.textContent =
@@ -4375,13 +4340,12 @@ overlay.addEventListener(
             return;
         }
 
-
-        /* CTRL + ALT + 5 = YES */
-        if(
-            ctrlAlt &&
-            e.code==="Digit5" &&
-            eligible.style.display==="block"
-        ){
+        /* Shift + 5 = YES */
+        if (
+            e.shiftKey &&
+            e.code === "Digit5" &&
+            eligible.style.display === "block"
+        ) {
 
             e.preventDefault();
             e.stopPropagation();
@@ -4391,13 +4355,12 @@ overlay.addEventListener(
             return;
         }
 
-
-        /* CTRL + ALT + 0 = NO */
-        if(
-            ctrlAlt &&
-            e.code==="Digit0" &&
-            eligible.style.display==="block"
-        ){
+        /* Shift + 0 = NO */
+        if (
+            e.shiftKey &&
+            e.code === "Digit0" &&
+            eligible.style.display === "block"
+        ) {
 
             e.preventDefault();
             e.stopPropagation();
@@ -4407,8 +4370,39 @@ overlay.addEventListener(
             return;
         }
 
+        /* ENTER */
+        if (e.key === "Enter") {
 
-        if(e.key==="Escape"){
+            const active = document.activeElement;
+
+            if (active === stateInput) {
+
+                e.preventDefault();
+                processGo();
+                return;
+
+            } else if (
+                eligible.style.display === "block" &&
+                yesExtra.style.display === "block" &&
+                !continueBtn.disabled
+            ) {
+
+                e.preventDefault();
+                continueBtn.click();
+                return;
+
+            } else if (
+                eligible.style.display === "block" &&
+                yesExtra.style.display !== "block"
+            ) {
+
+                e.preventDefault();
+                noBtn.click();
+                return;
+            }
+        }
+
+        if (e.key === "Escape") {
 
             e.preventDefault();
 
@@ -4423,7 +4417,6 @@ overlay.addEventListener(
     },
     true
 );
-
 /* =========================================================
    CLOSE
    ========================================================= */
