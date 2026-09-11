@@ -4267,8 +4267,8 @@ overlay.addEventListener(
     e=>{
 
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            !e.ctrlKey &&
+            e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
             e.key==="2"
@@ -4300,8 +4300,8 @@ overlay.addEventListener(
 
 
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            !e.ctrlKey &&
+            e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
             e.key==="3"
@@ -4333,8 +4333,8 @@ overlay.addEventListener(
 
 
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            !e.ctrlKey &&
+            e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
             e.key==="4"
@@ -4366,8 +4366,8 @@ overlay.addEventListener(
 
 
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            !e.ctrlKey &&
+            e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
             e.key==="5"
@@ -4432,8 +4432,8 @@ overlay.addEventListener(
 
 
         if(
-            e.ctrlKey &&
-            !e.altKey &&
+            !e.ctrlKey &&
+            e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
             e.key==="1" &&
@@ -4452,7 +4452,6 @@ overlay.addEventListener(
     },
     true
 );
-
 
 /* =========================================================
    CLOSE
