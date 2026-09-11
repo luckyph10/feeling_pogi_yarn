@@ -4267,7 +4267,7 @@ overlay.addEventListener(
     e=>{
 
         if(
-            e.altKey &&
+            e.ctrlKey &&
             !e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
@@ -4300,7 +4300,7 @@ overlay.addEventListener(
 
 
         if(
-            e.altKey &&
+            e.ctrlKey &&
             !e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
@@ -4333,7 +4333,7 @@ overlay.addEventListener(
 
 
         if(
-            e.altKey &&
+            e.ctrlKey &&
             !e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
@@ -4366,7 +4366,7 @@ overlay.addEventListener(
 
 
         if(
-            e.altKey &&
+            e.ctrlKey &&
             !e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
@@ -4413,7 +4413,7 @@ overlay.addEventListener(
 
 
         if(
-            e.altKey &&
+            e.ctrlKey &&
             !e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
@@ -4432,7 +4432,7 @@ overlay.addEventListener(
 
 
         if(
-            e.altKey &&
+            e.ctrlKey &&
             !e.altKey &&
             !e.metaKey &&
             !e.shiftKey &&
