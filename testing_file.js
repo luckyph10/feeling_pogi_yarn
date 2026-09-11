@@ -4259,20 +4259,23 @@ continueBtn.onclick=async()=>{
 
 
 /* =========================================================
-   KEYBOARD SHORTCUTS
+   KEYBOARD SHORTCUTS (ALT + Z X C V B)
    ========================================================= */
 
 overlay.addEventListener(
     "keydown",
     e=>{
 
-        /* ALT + 1 = Duplicate Comments -> N/A */
-        if(
+        const altOnly =
             e.altKey &&
             !e.ctrlKey &&
             !e.metaKey &&
-            !e.shiftKey &&
-            e.key==="1"
+            !e.shiftKey;
+
+        /* ALT + Z = N/A */
+        if(
+            altOnly &&
+            e.code==="KeyZ"
         ){
 
             e.preventDefault();
@@ -4284,9 +4287,7 @@ overlay.addEventListener(
             duplicateCommentsInput.dispatchEvent(
                 new Event(
                     "change",
-                    {
-                        bubbles:true
-                    }
+                    { bubbles:true }
                 )
             );
 
@@ -4297,13 +4298,10 @@ overlay.addEventListener(
         }
 
 
-        /* ALT + 2 = Duplicate Dispute Reviewed */
+        /* ALT + X = Duplicate Dispute Reviewed */
         if(
-            e.altKey &&
-            !e.ctrlKey &&
-            !e.metaKey &&
-            !e.shiftKey &&
-            e.key==="2"
+            altOnly &&
+            e.code==="KeyX"
         ){
 
             e.preventDefault();
@@ -4315,9 +4313,7 @@ overlay.addEventListener(
             duplicateCommentsInput.dispatchEvent(
                 new Event(
                     "change",
-                    {
-                        bubbles:true
-                    }
+                    { bubbles:true }
                 )
             );
 
@@ -4328,13 +4324,10 @@ overlay.addEventListener(
         }
 
 
-        /* ALT + 3 = Plantype Mismatch NO */
+        /* ALT + C = Plantype Mismatch NO */
         if(
-            e.altKey &&
-            !e.ctrlKey &&
-            !e.metaKey &&
-            !e.shiftKey &&
-            e.key==="3"
+            altOnly &&
+            e.code==="KeyC"
         ){
 
             e.preventDefault();
@@ -4346,9 +4339,7 @@ overlay.addEventListener(
             mismatchInput.dispatchEvent(
                 new Event(
                     "change",
-                    {
-                        bubbles:true
-                    }
+                    { bubbles:true }
                 )
             );
 
@@ -4359,13 +4350,10 @@ overlay.addEventListener(
         }
 
 
-        /* ALT + 4 = Plantype Mismatch YES */
+        /* ALT + V = Plantype Mismatch YES */
         if(
-            e.altKey &&
-            !e.ctrlKey &&
-            !e.metaKey &&
-            !e.shiftKey &&
-            e.key==="4"
+            altOnly &&
+            e.code==="KeyV"
         ){
 
             e.preventDefault();
@@ -4377,14 +4365,44 @@ overlay.addEventListener(
             mismatchInput.dispatchEvent(
                 new Event(
                     "change",
-                    {
-                        bubbles:true
-                    }
+                    { bubbles:true }
                 )
             );
 
             status.textContent =
                 "Plantype Mismatch: Yes";
+
+            return;
+        }
+
+
+        /* ALT + B = YES */
+        if(
+            altOnly &&
+            e.code==="KeyB" &&
+            eligible.style.display==="block"
+        ){
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            yesBtn.click();
+
+            return;
+        }
+
+
+        /* ALT + N = NO */
+        if(
+            altOnly &&
+            e.code==="KeyN" &&
+            eligible.style.display==="block"
+        ){
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            noBtn.click();
 
             return;
         }
@@ -4398,44 +4416,6 @@ overlay.addEventListener(
             style.remove();
 
             resolve(null);
-
-            return;
-        }
-
-
-        /* ALT + 0 = NO */
-        if(
-            e.altKey &&
-            !e.ctrlKey &&
-            !e.metaKey &&
-            !e.shiftKey &&
-            e.key==="0" &&
-            eligible.style.display==="block"
-        ){
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            noBtn.click();
-
-            return;
-        }
-
-
-        /* ALT + 5 = YES */
-        if(
-            e.altKey &&
-            !e.ctrlKey &&
-            !e.metaKey &&
-            !e.shiftKey &&
-            e.key==="5" &&
-            eligible.style.display==="block"
-        ){
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            yesBtn.click();
 
             return;
         }
